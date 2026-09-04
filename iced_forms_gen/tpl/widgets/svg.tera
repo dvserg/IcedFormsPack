@@ -1,0 +1,30 @@
+{# Файл: templates/widgets/svg.tera #}
+{% macro get_imports() %}
+    iced::widget::svg,
+    iced::{Length, Padding, Color, Element, Theme},
+{% endmacro %}
+
+{# 📐 Извлекаем из ОЗУ готовую геометрию #}
+{%- set padding_code = widget.properties | get(key="padding_code", default="") -%}
+
+{# 🗺️ Извлекаем файловый путь к SVG-иконке, подготовленный ОЗУ-автоматом строк #}
+{%- set svg_path = widget.properties | get(key="path_code", default="assets/icon.svg") -%}
+
+{# 🎨 Извлекаем цвет тонирования (color_code), если мы хотим перекрасить векторную иконку прямо в коде #}
+{%- set color_code = widget.properties | get(key="color_code", default="") -%}
+
+{# Инициализируем векторную графику через каноничный Handle загрузки с диска в Iced 0.14 [🌐] #}
+svg(iced::widget::svg::Handle::from_path({{ svg_path }}))
+    {# 📐 Высота и Ширина SVG-виджета #}
+    {%- if widget.properties.width_code -%}.width({{ widget.properties.width_code }}){%- endif -%}
+    {%- if widget.properties.height_code -%}.height({{ widget.properties.height_code }}){%- endif -%}
+
+    {# 📐 Снайперский вывод отступов SVG из ОЗУ #}
+    {%- if padding_code -%}
+        .padding({{ padding_code }})
+    {%- endif -%}
+
+    {# 🎨 Тонирование/Заливка вектора кастомным цветом (если свойство задано в VTable) #}
+    {%- if color_code -%}
+        .color({{ color_code }})
+    {%- endif -%}

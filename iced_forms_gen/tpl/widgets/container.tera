@@ -1,0 +1,59 @@
+{# Файл: templates/widgets/container.tera #}
+{% macro get_imports() %}
+    iced::widget::container,
+    iced::{Length, Padding, Border, Background, Element, Theme},
+    iced::border::Radius,
+{% endmacro %}
+
+{%- set bg_color = widget.properties | get(key="bg_color_code", default="") -%}
+{%- set border_color = widget.properties | get(key="border_color_code", default="") -%}
+{%- set radius_code = widget.properties | get(key="border_radius_code", default="") -%}
+{%- set padding_code = widget.properties | get(key="padding_code", default="") -%}
+
+{# 🛸 Ищем единственного ребенка, у которого parent == ID этого контейнера #}
+{%- set child_id = "" -%}
+{%- for potential_child_id in widgets_order -%}
+    {%- set child_widget = widgets[potential_child_id] -%}
+    {%- if child_widget.properties and child_widget.properties.parent == id -%}
+        {%- set child_id = potential_child_id -%}
+    {%- endif -%}
+{%- endfor -%}
+
+container(
+    {%- if child_id != "" -%}
+        {{ child_id }}
+    {%- else -%}
+        {# Если контейнер пуст, подставляем safe-распорку #}
+        space::Space::new().width(0.0).height(0.0)
+    {%- endif -%}
+)
+    {# 📐 Высота и Ширина контейнера #}
+    {%- if widget.properties.width_code -%}.width({{ widget.properties.width_code }}){%- endif -%}
+    {%- if widget.properties.height_code -%}.height({{ widget.properties.height_code }}){%- endif -%}
+
+    {# 📐 Снайперский вывод внутренних отступов Iced 0.14 одной строкой из ОЗУ #}
+    {%- if padding_code -%}
+        .padding({{ padding_code }})
+    {%- endif -%}
+
+    {# 🎨 Стилизация, цвета и обводка контейнера Iced 0.14 через локальный container::Style #}
+    {%- if bg_color or border_color or radius_code -%}
+    .style(move | _status | container::Style {
+        {% if bg_color %}
+        background: Some(iced::Background::Color({{ bg_color }})),
+        {% endif %}
+        
+        border: Border {
+            {% if border_color %}
+            color:  {{ border_color }},
+            width:  {{ widget.properties.border_width_code | default(value="1.0") }},
+            {% endif %}
+            
+            {# Снайперский вывод структуры радиуса из нашего нового Rust-автомата #}
+            {% if radius_code %}
+            radius: {{ radius_code }},
+            {% endif %}
+        },
+        ..container::Style::default()
+    })
+    {%- endif -%}

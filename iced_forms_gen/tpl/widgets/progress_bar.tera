@@ -1,0 +1,28 @@
+{# Файл: templates/widgets/progress_bar.tera #}
+{% macro get_imports() %}
+    iced::widget::progress_bar,
+    iced::{Length, Padding, Element, Theme},
+{% endmacro %}
+
+{# 📐 Извлекаем из ОЗУ готовую геометрию #}
+{%- set padding_code = widget.properties | get(key="padding_code", default="") -%}
+
+{# 🛰️ Извлекаем параметры диапазона и текущее значение шкалы #}
+{# Метод f32_code гарантирует правильную нотацию float чисел (например, "0.0") #}
+{%- set min_val   = widget.properties | get(key="min_code", default="0.0") -%}
+{%- set max_val   = widget.properties | get(key="max_code", default="100.0") -%}
+{%- set cur_val   = widget.properties | get(key="value_code", default="0.0") -%}
+
+{# Конструктор progress_bar в Iced 0.14 строго принимает диапазон и текущее значение float [🌐] #}
+progress_bar(
+    {{ min_val }}..={{ max_val }},
+    {{ cur_val }}
+)
+    {# 📐 Высота и Ширина прогресс-бара #}
+    {%- if widget.properties.width_code -%}.width({{ widget.properties.width_code }}){%- endif -%}
+    {%- if widget.properties.height_code -%}.height({{ widget.properties.height_code }}){%- endif -%}
+
+    {# 📐 Снайперский вывод отступов из ОЗУ #}
+    {%- if padding_code -%}
+        .padding({{ padding_code }})
+    {%- endif -%}

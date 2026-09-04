@@ -1,0 +1,42 @@
+{# Файл: templates/widgets/slider.tera #}
+{% macro get_imports() %}
+    iced::widget::slider,
+    iced::{Length, Padding, Element, Theme},
+{% endmacro %}
+
+{# 📐 Извлекаем из ОЗУ готовый монолитный код геометрии #}
+{%- set padding_code = widget.properties | get(key="padding_code", default="") -%}
+
+{# 🛰️ Извлекаем параметры диапазона, шаг и текущее значение ползунка #}
+{# Метод f32_code гарантирует правильную нотацию float чисел (например, "0.0") #}
+{%- set min_val   = widget.properties | get(key="min_code", default="0.0") -%}
+{%- set max_val   = widget.properties | get(key="max_code", default="100.0") -%}
+{%- set cur_val   = widget.properties | get(key="value_code", default="0.0") -%}
+{%- set step_val  = widget.properties | get(key="step_code", default="1.0") -%}
+
+{# 🎛️ Извлекаем реактивное событие изменения положения ползунка #}
+{%- set action_name = widget.properties | get(key="action", default="") | trim -%}
+
+{# Конструктор slider в Iced 0.14 строго принимает диапазон, текущее значение и замыкание/сообщение #}
+slider(
+    {{ min_val }}..={{ max_val }},
+    {{ cur_val }},
+    {# Если пользователь двигает ползунок — отправляем кастомный экшен, иначе NoOp-заглушку #}
+    {%- if action_name != "" and action_name != "None" -%}
+        crate::core::Message::{{ action_name }}
+    {%- else -%}
+
+        |_| crate::core::Message::NoOp
+    {%- endif -%}
+)
+    {# 📐 Задаем шаг изменения значения #}
+    .step({{ step_val }})
+
+    {# 📐 Высота и Ширина слайдера #}
+    {%- if widget.properties.width_code -%}.width({{ widget.properties.width_code }}){%- endif -%}
+    {%- if widget.properties.height_code -%}.height({{ widget.properties.height_code }}){%- endif -%}
+
+    {# 📐 Снайперский вывод отступов слайдера из ОЗУ #}
+    {%- if padding_code -%}
+        .padding({{ padding_code }})
+    {%- endif -%}

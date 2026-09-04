@@ -1,0 +1,21 @@
+{# Файл: templates/widgets/text.tera #}
+{# Импортируем макросы из соседнего файла #}
+{% import "properties.tera" as props %}
+
+{% macro get_imports() %}
+    iced::widget::text,
+    iced::alignment::{Horizontal, Vertical},
+    iced::{Length, Color, Font, Element, Theme},
+    iced::widget::text::{Wrapping, Shaping},
+{% endmacro %}
+
+{# Генерируем код текста Iced #}
+iced::widget::text({{ widget.properties | get(key="text_content_code", default='"Текст"') }})
+    {{- props::geometry(properties=widget.properties) -}}
+    {{- props::text_color(properties=widget.properties) -}}
+    {{- props::font(properties=widget.properties) -}}
+    {{- props::text_size(properties=widget.properties) -}}
+    {{- props::text_layout(properties=widget.properties) -}}
+    {{- props::alignment(properties=widget.properties) -}}
+
+    

@@ -1,0 +1,102 @@
+{# МАКРОСЫ СВОЙСТВ #}
+
+{# Макрос для базовой геометрии #}
+{# Параметры: width | width_code, height | height_code #}
+{% macro geometry(properties) %}
+    {%- if properties.width is defined and properties.width -%}
+        .width({{ properties.width }})
+    {%- elif properties.width_code is defined and properties.width_code -%}
+        .width({{ properties.width_code }})
+    {%- endif -%}
+
+    {%- if properties.height is defined and properties.height -%}
+        .height({{ properties.height }})
+    {%- elif properties.height_code is defined and properties.height_code -%}
+        .height({{ properties.height_code }})
+    {%- endif -%}
+{% endmacro %}
+
+
+{# Макрос для цвета текста #}
+{# Параметры: text_color #}
+{% macro text_color(properties) %}
+    {%- if properties.text_color is defined and properties.text_color -%}
+        .color({{ properties.text_color }})
+    {%- elif properties.text_color_code is defined and properties.text_color_code -%}
+        .color({{ properties.text_color_code }})
+    {%- endif -%}
+{% endmacro %}
+
+
+{# Размер текста|шрифта [font_size | text_size] #}
+{# Параметры: text_size | text_size_code | fort_size | fort_size_code #}
+{% macro text_size(properties) %}
+    {%- if widget.properties.text_size is defined and widget.properties.text_size -%}
+        .size({{ widget.properties.text_size }})
+    {%- elif widget.properties.text_size_code is defined and widget.properties.text_size_code -%}
+        .size({{ widget.properties.text_size_code }})
+    {%- elif widget.properties.font_size is defined and widget.properties.font_size -%}
+        .size({{ widget.properties.font_size_code }})
+    {%- elif widget.properties.font_size is defined and widget.properties.font_size -%}
+        .size({{ widget.properties.font_size_code }})
+    {%- endif -%}
+{% endmacro %}
+
+
+{# Шрифт #}
+{# Параметры: font_family, font_weight, font_style #}
+{% macro font(properties) %}
+    {# Извлекаем сырые параметры шрифта внутри макроса #}
+    {%- set font_name   = properties | get(key="font_family", default="System") -%}
+    {%- set is_bold     = properties | get(key="font_weight", default="false") -%}
+    {%- set is_italic   = properties | get(key="font_style",  default="false") -%}
+
+    {# Генерируем код метода .font() #}
+    {%- if properties.font_code is defined and properties.font_code -%}
+        .font({{ properties.font_code | safe }})
+    {%- else -%}
+        .font(crate::core::utils::create_iced_font(
+            "{{ font_name | replace(from='"', to='') }}",
+            {{ is_bold }},
+            {{ is_italic }}
+        ))
+    {%- endif -%}
+{% endmacro %}
+
+
+{# Расположение текста #}
+{# Параметры: wrapping | wrapping_code, shaping | shaping_code #}
+{% macro text_layout(properties) %}
+    {# wrapping #}
+    {%- if widget.properties.wrapping is defined and widget.properties.wrapping -%}
+        .wrapping(iced::widget::text::Wrapping::Word)
+    {%- elif widget.properties.wrapping_code is defined and widget.properties.wrapping_code -%}
+        .wrapping(iced::widget::text::Wrapping::Word)
+    {%- endif -%}
+
+    {# shaping #}
+    {%- if widget.properties.shaping is defined and widget.properties.shaping -%}
+        .shaping(iced::widget::text::Shaping::Advanced)
+    {%- elif widget.properties.shaping_code is defined and widget.properties.shaping_code -%}
+        .shaping(iced::widget::text::Shaping::Advanced)
+    {%- endif -%}
+{% endmacro %}
+
+
+{# Выравнивание #}
+{# Параметры: align_x | align_x_code, align_y | align_y_code #}
+{% macro alignment(properties) %}
+    {# align_x #}
+    {% if widget.properties.align_x is defined and widget.properties.align_x %}
+        .align_x({{ widget.properties.align_x }})
+    {% elif widget.properties.align_x_code is defined and widget.properties.align_x_code %}
+        .align_x({{ widget.properties.align_x_code }})
+    {% endif %}
+
+    {# align_y #}
+    {% if widget.properties.align_y is defined and widget.properties.align_y %}
+        .align_y({{ widget.properties.align_y }})
+    {% elif widget.properties.align_y_code is defined and widget.properties.align_y_code %}
+        .align_y({{ widget.properties.align_y_code }})
+    {% endif %}
+{% endmacro %}

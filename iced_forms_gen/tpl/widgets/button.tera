@@ -1,0 +1,64 @@
+{# Файл: templates/widgets/button.tera #}
+{% macro get_imports() %}
+    iced::widget::{button, text},
+    iced::{Length, Padding, Color, Border, Pixels, Alignment, Font},
+    iced::alignment::{Horizontal, Vertical},
+    iced::border::Radius,
+{% endmacro %}
+
+{%- set txt_color = widget.properties | get(key="text_color_code", default="") -%}
+{%- set bg_color = widget.properties | get(key="bg_color_code", default="") -%}
+{%- set border_color = widget.properties | get(key="border_color_code", default="") -%}
+{%- set padding_code = widget.properties | get(key="padding_code", default="") -%}
+{%- set radius_code = widget.properties | get(key="border_radius_code", default="") -%}
+{%- set action_name = widget.properties | get(key="action", default="") | trim -%}
+
+{# 🔥 ФИКС ОШИБКИ №1: Скобка ) закрывает text() строго ДО навешивания стилей самого button! #}
+button(
+    text("{{ widget.properties.text | default(value=widget.properties.label | default(value='Кнопка')) }}")
+        .width(iced::Length::Fill).height(iced::Length::Fill)
+        .align_x(Horizontal::Center).align_y(Vertical::Center)
+        {%- if txt_color -%}.color({{ txt_color }}){%- endif -%}
+        {%- if widget.properties.font_size_code -%}.size({{ widget.properties.font_size_code }})
+        {%- elif widget.properties.text_size_code -%}.size({{ widget.properties.text_size_code }})
+        {%- endif -%}
+)
+    {# Action #}
+    {%- if action_name != "" and action_name != "None" -%}
+        .on_press(crate::core::Message::WidgetEvent(
+            crate::core::WidgetAction::OnPress(
+                "{{ id }}".to_string(),
+                "{{ action_name }}".to_string()
+            )
+        ))
+    {%- else -%}
+        .on_press(crate::core::Message::NoOp)
+    {%- endif -%}
+      
+    {# 🔥 ФИКС ОШИБКИ №2: Извлекаем монолитный скомпилированный код из ОЗУ без лишних оберток #}
+    {%- if widget.properties.width_code -%}.width({{ widget.properties.width_code }}){%- endif -%}
+    {%- if widget.properties.height_code -%}.height({{ widget.properties.height_code }}){%- endif -%}
+    
+    {# 📐 Снайперский вывод отступов Iced 0.14 одной строкой из ОЗУ #}
+    {%- if padding_code -%}
+        .padding({{ padding_code }})
+    {%- endif -%}
+
+    {# 🎨 Стилизация и палитра Iced 0.14 строго через локальный button::Style #}
+    {%- if bg_color or border_color or radius_code -%}
+    .style(move |_theme, _status| button::Style {
+        {% if bg_color %}
+        background: Some(iced::Background::Color({{ bg_color }})),
+        {% endif %}
+        border: Border {
+            {% if border_color %}
+            color:  {{ border_color }},
+            width:  {{ widget.properties.border_width_code | default(value="1.0") }},
+            {% endif %}
+            {% if radius_code %}
+            radius: {{ radius_code }},
+            {% endif %}
+        },
+        ..button::Style::default()
+    })
+    {%- endif -%}

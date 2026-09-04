@@ -1,0 +1,20 @@
+{# Файл: templates/widgets/space.tera #}
+{% macro get_imports() %}
+    iced::widget::space,
+    iced::Length,
+{% endmacro %}
+
+{# Инициализируем каноничную пустую распорку Iced 0.14 #}
+space::Space::new()
+    {# 📐 Высота и Ширина распорки: Просто пробрасываем готовый скомпилированный код из ОЗУ! #}
+    {%- if widget.properties.width_code -%}
+        .width({{ widget.properties.width_code }})
+    {%- else -%}
+        .width(iced::Length::Shrink)
+    {%- endif -%}
+
+    {%- if widget.properties.height_code -%}
+        .height({{ widget.properties.height_code }})
+    {%- else -%}
+        .height(iced::Length::Shrink)
+    {%- endif -%}

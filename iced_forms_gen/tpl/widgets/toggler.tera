@@ -1,0 +1,45 @@
+{# Файл: templates/widgets/toggler.tera #}
+{% macro get_imports() %}
+    iced::widget::toggler,
+    iced::{Length, Padding, Element, Theme},
+{% endmacro %}
+
+{# 📐 Извлекаем из ОЗУ готовую геометрию #}
+{%- set padding_code = widget.properties | get(key="padding_code", default="") -%}
+
+{# 🛰️ Извлекаем текущее состояние переключателя и его подпись #}
+{%- set is_toggled  = widget.properties | get(key="value_code", default="false") -%}
+{%- set label_text  = widget.properties | get(key="text_code", default='"Переключатель"') -%}
+
+{# 🎛️ Извлекаем реактивное событие изменения состояния #}
+{%- set action_name = widget.properties | get(key="action", default="") | trim -%}
+
+toggler(
+    {{ label_text }},
+    {{ is_toggled }},
+    {# Если пользователь кликает по тумблеру — отправляем экшен, иначе NoOp-заглушку с игнорированием булева аргумента #}
+    {%- if action_name != "" and action_name != "None" -%}
+
+        |val| crate::core::Message::WidgetEvent(
+            crate::core::Message::WidgetAction::OnToggle(
+                "{{ id }}".to_string(),
+                "{{ action_name }}".to_string(),
+                val
+            )
+        )
+    {%- else -%}
+
+        |_| crate::core::Message::NoOp
+    {%- endif -%}
+)
+    {# 📐 Высота и Ширина переключателя #}
+    {%- if widget.properties.width_code -%}.width({{ widget.properties.width_code }}){%- endif -%}
+    {%- if widget.properties.height_code -%}.height({{ widget.properties.height_code }}){%- endif -%}
+
+    {# 📐 Снайперский вывод отступов переключателя из ОЗУ #}
+    {%- if padding_code -%}.padding({{ padding_code }}){%- endif -%}
+
+    {# 📐 Размер самого тумблера, если задан в VTable #}
+    {%- if widget.properties.size_code -%}
+        .size({{ widget.properties.size_code }})
+    {%- endif -%}

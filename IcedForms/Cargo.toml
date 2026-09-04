@@ -1,0 +1,65 @@
+[package]
+name = "IcedForms"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+iced = { version = "0.14.*", features = ["image", "svg", "qr_code", "advanced", "lazy", "wgpu", "markdown"] }
+# Подключаем iced_aw с поддержкой выпадающих меню
+iced_aw = { version = "0.14.*", features = ["menu"] } 
+
+# Rich text ext
+rtf-parser = "0.4.1"
+
+# Массивы 
+indexmap = { version = "2.0", features = ["serde"] }
+
+# Сериализация
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+
+# Поддержка макросов
+inventory = "0.3" 
+
+log = "0.4"
+env_logger = "0.11"
+# Логер с поддержкой файлов и консоли
+flexi_logger = "0.29" 
+
+# Системные диалоги Windows
+rfd = { version = "0.15", features = ["xdg-portal"] }
+
+# Clipboard
+clipboard-win = "5.4"
+encoding_rs = "0.8"
+
+# Нативно подключаем систему дескрипторов для Iced 0.14
+raw-window-handle = "0.6" 
+
+# Генератор случайных чисел
+rand = "0.8"
+
+# Парсер аргументов командной строки:
+clap = { version = "4.5", features = ["derive"] }
+
+tracing = "0.1"
+# Переходник, который перенаправляет логи `tracing` прямиком в запущенный tracy-profiler
+tracing-tracy = "0.11" 
+tracing-subscriber = { version = "0.3", features = ["registry"] }
+
+# Добавляем шаблонизатор кода:
+tera = { version = "2.1.*", features = ["glob_fs"]}
+
+# Еще одно форматирование
+syn = { version = "2.0", features = ["full", "extra-traits"] }
+quote = "1.0"
+prettyplease = "0.2"
+
+# Clipboard
+arboard = "3.4"
+clipboard-rs = "0.3.5"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = ["Win32_UI_WindowsAndMessaging"] }

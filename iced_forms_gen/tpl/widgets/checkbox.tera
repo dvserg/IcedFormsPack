@@ -1,0 +1,85 @@
+{# Файл: templates/widgets/checkbox.tera #}
+{% macro get_imports() %}
+    iced::widget::{checkbox, text},
+    iced::{Length, Padding, Font, Element, Theme},
+{% endmacro %}
+
+{# Извлекаем из ОЗУ параметры геометрии отступов #}
+{%- set padding_code = widget.properties | get(key="padding_code", default="") -%}
+
+{# Извлекаем текст подписи чекбокса, по умолчанию "Чекбокс" #}
+{%- set label_text = widget.properties | get(key="text_code", default='"Чекбокс"') -%}
+
+{# Цепочечный перехват булева состояния: если нет value_code, ищем id_checked_code -> "false" #}
+{%- set is_checked = widget.properties | get(key="value_code", default=widget.properties | get(key="id_checked_code", default="false")) -%}
+
+{# Извлекаем имя реактивного экшена из JSON макета #}
+{%- set action_name = widget.properties | get(key="action", default="") | trim -%}
+
+{# Извлекаем сырые параметры шрифта для фабричного конструктора #}
+{%- set font_name   = widget.properties | get(key="font_family", default="System") -%}
+{%- set is_bold     = widget.properties | get(key="font_weight", default="false") -%}
+{%- set is_italic   = widget.properties | get(key="font_style", default="false") -%}
+
+
+{# Конструктор Iced 0.14: принимает строго один логический аргумент состояния #}
+checkbox( app.state.{{ id }}_checked )
+    {# Передаем текст подписи лейбла через метод .label() #}
+    .label( app.state.{{ id }}_label.as_str() )
+
+    {# ШРИФТ: Вызываем фабричный конструктор шрифтов из нашего модуля утилий без капризов Tera #}
+    {%- if widget.properties.font_code -%}
+        .font({{ widget.properties.font_code }})
+    {%- else -%}
+        .font(crate::core::utils::create_iced_font(
+            "{{ font_name | replace(from='"', to='') }}",
+            {{ is_bold }},
+            {{ is_italic }}
+        ))
+    {%- endif -%}
+
+    {# Размер самого флага чекбокса #}
+    {%- if widget.properties.flag_size_code -%}.size({{ widget.properties.flag_size_code }}){%- endif -%}
+
+    {# Отступ текста #}
+    {%- if widget.properties.spacing_code -%}.spacing({{ widget.properties.spacing_code }}){%- endif -%}
+
+    {# Высота строки текста (не размер шрифта!!) #}
+    {%- if widget.properties.line_height_code -%}.text_line_height(text::LineHeight::Relative({{ widget.properties.line_height_code }})){%- endif -%}
+
+    {# Ширина блока чекбокса #}
+    {%- if widget.properties.width_code -%}.width({{ widget.properties.width_code }}){%- endif -%}
+
+    {# Снайперский вывод внутренних отступов текста из ОЗУ #}
+    {%- if padding_code -%}.padding({{ padding_code }}){%- endif -%}
+
+    {# Перенос слов (Wrapping): Считываем код из JSON-макета #}
+    {%- if widget.properties.wrapping == "Word" or widget.properties.wrapping_code == "true" or widget.properties.wrapping == true -%}
+        .text_wrapping(iced::widget::text::Wrapping::Word)
+    {%- elif widget.properties.wrapping == "None" or widget.properties.wrapping_code == "false" or widget.properties.wrapping == false -%}
+        .text_wrapping(iced::widget::text::Wrapping::None)
+    {%- elif widget.properties.wrapping_code -%}
+        .text_wrapping({{ widget.properties.wrapping_code }})
+    {%- endif -%}
+
+    {# Формирование текста (Shaping): Считываем код из JSON-макета #}
+    {%- if widget.properties.shaping == "Advanced" or widget.properties.shaping_code == "true" or widget.properties.shaping == true -%}
+        .text_shaping(iced::widget::text::Shaping::Advanced)
+    {%- elif widget.properties.shaping == "Basic" or widget.properties.shaping_code == "false" or widget.properties.shaping == false -%}
+        .text_shaping(iced::widget::text::Shaping::Basic)
+    {%- elif widget.properties.shaping_code -%}
+        .text_shaping({{ widget.properties.shaping_code }})
+    {%- endif -%}
+
+
+    {# Навешиваем замыкание шины событий через метод .on_toggle() #}
+    {%- if action_name != "" and action_name != "None" -%}.on_toggle(|val| crate::core::Message::WidgetEvent(
+            crate::core::WidgetAction::OnToggle(
+                "{{ id }}".to_string(),
+                "{{ action_name }}".to_string(),
+                val
+            )
+        ))
+    {%- else -%}
+        .on_toggle(|_| crate::core::Message::NoOp)
+    {%- endif -%}

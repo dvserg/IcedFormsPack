@@ -1,0 +1,40 @@
+{# Файл: templates/widgets/qr_code.tera #}
+{% macro get_imports() %}
+    iced::widget::qr_code,
+    iced::{Length, Padding, Element, Theme},
+{% endmacro %}
+
+{# Извлекаем из ОЗУ готовую геометрию #}
+{%- set padding_code = widget.properties | get(key="padding_code", default="") -%}
+
+{# ИСТИННЫЙ КОНСТРУКТОР ICED 0.14: Передаем только ОДИН аргумент — ссылку на Data! #}
+qr_code(&app.state.{{ id }}_data)
+    {# Размер одной ячейки QR-кода в пикселях #}
+    {%- if widget.properties.cell_size -%}
+        .cell_size({{ widget.properties.cell_size }})
+    {%- elif widget.properties.cell_size_code -%}
+        .cell_size({{ widget.properties.cell_size_code }})
+    {%- endif -%}
+
+    {# Высота и Ширина блока QR-кода #}
+    {%- if widget.properties.width_code -%}.width({{ widget.properties.width_code }}){%- endif -%}
+    {%- if widget.properties.height_code -%}.height({{ widget.properties.height_code }}){%- endif -%}
+
+    {# Снайперский вывод внешних отступов из ОЗУ #}
+    {%- if padding_code -%}.padding({{ padding_code }}){%- endif -%}
+
+    {# Стилизация цвета фона и ячеек QR-кода #}
+    {%- if widget.properties.bg_color_code or widget.properties.cell_color_code -%}
+        .style(|_theme| qr_code::Style {
+            {% if widget.properties.bg_color_code -%}
+                background: {{ widget.properties.bg_color_code }},
+            {%- else -%}
+                background: iced::Color::TRANSPARENT,
+            {%- endif %}
+            {% if widget.properties.cell_color_code -%}
+                cell: {{ widget.properties.cell_color_code }},
+            {%- else -%}
+                cell: iced::Color::BLACK,
+            {%- endif %}
+        })
+    {%- endif -%}

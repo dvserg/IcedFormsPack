@@ -1,0 +1,50 @@
+{# Файл: templates/widgets/scrollable.tera #}
+{% macro get_imports() %}
+    iced::widget::scrollable,
+    iced::{Length, Padding, Element, Theme},
+{% endmacro %}
+
+{# 📐 Извлекаем из ОЗУ готовую геометрию #}
+{%- set padding_code = widget.properties | get(key="padding_code", default="") -%}
+
+{# 🛸 Направление скроллинга (Vertical, Horizontal, Both) #}
+{%- set direction = widget.properties | get(key="direction", default="Vertical") | trim -%}
+
+{# 🛸 Ищем единственного ребенка, у которого parent == ID этого скроллера #}
+{%- set child_id = "" -%}
+{%- for potential_child_id in widgets_order -%}
+    {%- set child_widget = widgets[potential_child_id] -%}
+    {%- if child_widget.properties and child_widget.properties.parent == id -%}
+        {%- set child_id = potential_child_id -%}
+    {%- endif -%}
+{%- endfor -%}
+
+scrollable(
+    {%- if child_id != "" -%}
+        {{ child_id }}
+    {%- else -%}
+        {# Если скроллер пуст, подставляем safe-распорку #}
+        space::Space::new().width(0.0).height(0.0)
+    {%- endif -%}
+)
+    {# 📐 Высота и Ширина скроллера #}
+    {%- if widget.properties.width_code -%}.width({{ widget.properties.width_code }}){%- endif -%}
+    {%- if widget.properties.height_code -%}.height({{ widget.properties.height_code }}){%- endif -%}
+
+    {# 📐 Снайперский вывод внутренних отступов из ОЗУ #}
+    {%- if padding_code -%}
+        .padding({{ padding_code }})
+    {%- endif -%}
+
+    {# 🎛️ Настройка направления прокрутки в Iced 0.14 #}
+    {%- if direction == "Horizontal" -%}
+        .direction(iced::widget::scrollable::Direction::Horizontal(iced::widget::scrollable::Properties::default()))
+    {%- elif direction == "Both" -%}
+        .direction(iced::widget::scrollable::Direction::Both { 
+            vertical: iced::widget::scrollable::Properties::default(), 
+            horizontal: iced::widget::scrollable::Properties::default() 
+        })
+    {%- else -%}
+        {# По умолчанию вертикальный скролл #}
+        .direction(iced::widget::scrollable::Direction::Vertical(iced::widget::scrollable::Properties::default()))
+    {%- endif -%}

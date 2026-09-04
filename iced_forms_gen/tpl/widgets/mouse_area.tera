@@ -1,0 +1,50 @@
+{# Файл: templates/widgets/mouse_area.tera #}
+{% macro get_imports() %}
+    iced::widget::mouse_area,
+    iced::{Length, Element, Theme},
+{% endmacro %}
+
+{# 🛰️ Извлекаем управляющие экшены из VTable-кучи параметров виджета #}
+{%- set action_press   = widget.properties | get(key="action_press", default="") | trim -%}
+{%- set action_release = widget.properties | get(key="action_release", default="") | trim -%}
+{%- set action_enter   = widget.properties | get(key="action_enter", default="") | trim -%}
+{%- set action_exit    = widget.properties | get(key="action_exit", default="") | trim -%}
+
+{# 🛸 Ищем единственного ребенка, у которого parent == ID этой мышиной области #}
+{%- set child_id = "" -%}
+{%- for potential_child_id in widgets_order -%}
+    {%- set child_widget = widgets[potential_child_id] -%}
+    {%- if child_widget.properties and child_widget.properties.parent == id -%}
+        {%- set child_id = potential_child_id -%}
+    {%- endif -%}
+{%- endfor -%}
+
+mouse_area(
+    {%- if child_id != "" -%}
+        {{ child_id }}
+    {%- else -%}
+        {# Если область пуста, подставляем safe-распорку #}
+        space::Space::new().width(0.0).height(0.0)
+    {%- endif -%}
+)
+    {# 🎛️ Реактивные события нажатий и отпусканий мыши #}
+    {%- if action_press != "" and action_press != "None" -%}
+        .on_press(crate::core::Message::{{ action_press }})
+    {%- endif -%}
+
+    {%- if action_release != "" and action_release != "None" -%}
+        .on_release(crate::core::Message::{{ action_release }})
+    {%- endif -%}
+
+    {# 🎛️ Реактивные события наведения и ухода курсора мыши #}
+    {%- if action_enter != "" and action_enter != "None" -%}
+        .on_enter(crate::core::Message::{{ action_enter }})
+    {%- endif -%}
+
+    {%- if action_exit != "" and action_exit != "None" -%}
+        .on_exit(crate::core::Message::{{ action_exit }})
+    {%- endif -%}
+
+    {# 📐 Высота и Ширина интерактивной области #}
+    {%- if widget.properties.width_code -%}.width({{ widget.properties.width_code }}){%- endif -%}
+    {%- if widget.properties.height_code -%}.height({{ widget.properties.height_code }}){%- endif -%}

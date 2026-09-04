@@ -1,0 +1,171 @@
+{# Файл: templates/src/app.rs.tera #}
+use crate::APP_TITLE;
+use crate::core::*;
+
+
+
+#[derive(Debug)]
+pub struct AppState {
+
+    {# АВТОМАТ ИНДИВИДУАЛЬНЫХ СОСТОЯНИЙ: Каждому инпуту — своё поле! #}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "text_input" %}
+    pub {{ id }}_state: String,
+        {%- endif -%}
+    {%- endfor %}
+
+    {# КАНОНИЧЕСКИЙ ВЫВОД ДАННЫХ QR-КОДОВ: Только Data, никаких служебных State! #}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "qr_code" %}
+    pub {{ id }}_data: iced::widget::qr_code::Data,
+        {%- endif -%}
+    {%- endfor %}
+
+    {# АВТОМАТ ДАННЫХ ДЛЯ ЧЕКБОКСОВ: Флаг состояния и строка подписи #}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "checkbox" %}
+    pub {{ id }}_checked: bool,
+    pub {{ id }}_label: String,
+        {%- endif -%}
+    {%- endfor %}
+
+}
+
+impl AppState {
+    fn new() -> Self {
+        Self {
+            {# Инициализация QR-кодов #}
+            {%- for id in widgets_order -%}
+                {%- set widget = widgets[id] -%}
+                {%- if widget.widget_type == "qr_code" -%}
+                    {%- set start_text = widget.properties | get(key="data_code", default=widget.properties | get(key="text_content_code", default='"https://iced.rs"')) -%}
+            {{ id }}_data: iced::widget::qr_code::Data::new({{ start_text }}).unwrap(),
+                {%- endif -%}
+            {%- endfor %}
+
+            {# ИНИЦИАЛИЗАЦИЯ ЧЕКБОКСОВ: Загружаем стартовые состояния из JSON свойств #}
+            {%- for id in widgets_order -%}
+                {%- set widget = widgets[id] -%}
+                {%- if widget.widget_type == "checkbox" -%}
+                    {%- set start_label = widget.properties | get(key="text_code", default='"Чекбокс"') -%}
+                    {%- set start_state = widget.properties | get(key="value_code", default=widget.properties | get(key="id_checked_code", default="false")) -%}
+            {{ id }}_checked: {{ start_state }},
+            {{ id }}_label: {{ start_label }}.to_string(),
+                {%- endif -%}
+            {%- endfor %}
+
+        }
+    }
+}
+
+impl Default for AppState {
+    fn default() -> Self {
+        Self::new() 
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct App {
+    pub state: AppState,
+}
+
+impl App {
+    pub fn init() -> (App, iced::Task<Message>) {
+        let mut app = App::default();
+        (app, iced::Task::none())
+    }
+
+    pub fn update(&mut self, message: Message) -> iced::Task<Message> {
+        match message {
+             // Глобальный перехват сообщений
+            // Фильтрация и обработка выбранных сообщений
+            Message::GlobalEvent(event) => {
+                
+                match event {
+                    // Сообщения клавиатуры
+                    iced::Event::Keyboard(iced::keyboard::Event::KeyPressed { 
+                        key: iced::keyboard::Key::Named(iced::keyboard::key::Named::Tab), 
+                        modifiers, // Можно проверить Shift+Tab через modifiers.shift()
+                        .. 
+                    }) => {
+                        if modifiers.shift() {
+                            // Если зажат Shift, перемещаем фокус НАЗАД
+                            return iced::widget::operation::focus_previous::<Message>();                            
+                        } else {
+                            return iced::widget::operation::focus_next::<Message>();
+                        }
+                    }
+
+                    _ => {  }
+                }
+            }
+
+            Message::WidgetEvent(action) => {
+                match action {                    
+                    WidgetAction::OnPress(id, prop_act) => {
+                        on_press(self, &id, &prop_act);
+                    }
+                    WidgetAction::OnToggle(id, prop_act, val) => {
+                        on_toggle(self, &id, &prop_act, val);
+                    }
+                    WidgetAction::OnSliderChange(id, prop_act, val) => {
+                        on_slider_change(self, &id, &prop_act, val);
+                    }
+                    WidgetAction::OnInputChange(id, prop_act, val) => {
+                        on_input_change(self, &id, &prop_act, val);
+                    }
+                    WidgetAction::OnMouseEnter(id, prop_act) => {
+                        on_mouse_enter(self, &id, &prop_act);
+                    }
+                    WidgetAction::OnMouseExit(id, prop_act) => {
+                        on_mouse_exit(self, &id, &prop_act);
+                    }
+                    WidgetAction::NoOp => {
+                        log::warn!("Событие WidgetAction::NoOp в нормальном режиме вызываться не должно. Проверьте источник события.");
+                    }
+                }
+            }
+
+            // Пустая операция-заглушка
+            Message::NoOp => {
+                log::warn!("App::update: Выполнена операция-заглушка 'Message:: NoOp'.");
+                return iced::Task::none()
+            }
+            // Пустая операция по дефолту - ловит все неизвестные события и выводит ошибку в лог
+            _ => {
+                log::error!("App::update: Выполнено необрабатываемое событие 'Message'. \
+                    При нормальной работе программы данное сообщение не появляется. \
+                    Проверьте возможные источники события 'Message::NoOp'");
+                return iced::Task::none()
+            }
+        };
+        iced::Task::none()
+    }
+
+    pub fn view(&self) -> iced::Element<'_, Message, iced::Theme> {
+        view::render_workspace(self)
+    }
+
+    pub fn run() -> iced::Result {
+        iced::application(
+            App::init,
+            App::update, 
+            App::view
+        )
+        .title(APP_TITLE)
+        .theme(App::theme) 
+        .subscription(App::subscription)
+        .run()
+    }
+
+    pub fn theme(&self) -> iced::Theme {
+        iced::Theme::Light
+    }
+
+    fn subscription(&self) -> iced::Subscription<Message> {
+        iced::event::listen().map(Message::GlobalEvent)     
+    }
+}

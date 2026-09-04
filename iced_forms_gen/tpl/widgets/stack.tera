@@ -1,0 +1,31 @@
+{# Файл: templates/widgets/stack.tera #}
+{% macro get_imports() %}
+    iced::widget::stack,
+    iced::{Length, Padding, Element, Theme},
+{% endmacro %}
+
+{# 📐 Извлекаем из ОЗУ готовую геометрию #}
+{%- set padding_code = widget.properties | get(key="padding_code", default="") -%}
+
+{# 🛸 Создаем локальный массив для сбора только тех детей, у которых parent == ID этого стека #}
+{%- set child_ids = [] -%}
+{%- for potential_child_id in widgets_order -%}
+    {%- set child_widget = widgets[potential_child_id] -%}
+    {%- if child_widget.properties and child_widget.properties.parent == id -%}
+        {%- set_global child_ids = child_ids | concat(with=potential_child_id) -%}
+    {%- endif -%}
+{%- endfor -%}
+
+stack![
+    {%- for child_id in child_ids %}
+    {{ child_id }},
+    {%- endfor %}
+]
+    {# 📐 Высота и Ширина контейнера наложения #}
+    {%- if widget.properties.width_code -%}.width({{ widget.properties.width_code }}){%- endif -%}
+    {%- if widget.properties.height_code -%}.height({{ widget.properties.height_code }}){%- endif -%}
+
+    {# 📐 Снайперский вывод отступов Iced 0.14 одной строкой из ОЗУ #}
+    {%- if padding_code -%}
+        .padding({{ padding_code }})
+    {%- endif -%}

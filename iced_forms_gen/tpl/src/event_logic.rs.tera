@@ -1,0 +1,61 @@
+{# Файл: templates/src/event_logic.rs.tera #}
+use ordered_float::OrderedFloat;
+use crate::core;
+use crate::app::App;
+
+
+
+// -----------------------------------------------------------------------------
+// Функции-обработчики событий элементов
+// -----------------------------------------------------------------------------
+
+
+// Обработчик нажатия кнопки
+pub fn on_press(app: &mut App, id: &str, prop_act: &str) {
+    log::info!("[on_press] Виджет: '{}' | Action: '{}'", id, prop_act);
+    
+    // Ваша бизнес-логика здесь:
+    // match prop_act { "SaveConfig" => { ... }, _ => {} }
+}
+
+// Обработчик событий переключателя (checkbox, toggler)
+pub fn on_toggle(app: &mut App, id: &str, prop_act: &str, val: bool) {
+    log::info!("[on_toggle] Виджет: '{}' | Action: '{}' | Флаг: {}", id, prop_act, val);
+    
+    // Ваша бизнес-логика здесь:
+    // Находим виджет в куче app.project.widgets по ключу 'id' и пишем в его VTable новое состояние!
+}
+
+// Обработчик событий слайдера
+pub fn on_slider_change(app: &mut App, id: &str, prop_act: &str, val: OrderedFloat<f32>) {
+    // Безопасно извлекаем чистый f32 из Eq-обертки
+    let clean_f32 = val.into_inner();
+    log::info!("[on_slider_change] Виджет: '{}' | Action: '{}' | Значение: {:.2}", id, prop_act, clean_f32);
+    
+    // Ваша бизнес-логика здесь:
+    // Мутируем числовые параметры внутри app
+}
+
+// Обработчик событий полей ввода
+pub fn on_input_change(app: &mut App, id: &str, prop_act: &str, val: String) {
+    log::info!("[on_input_change] Виджет: '{}' | Action: '{}' | Текст: '{}'", id, prop_act, val);
+    
+    // Ваша бизнес-логика здесь:
+    // Запечатываем пользовательскую строку напрямую в RAM-хранилище app
+}
+
+// Обработчик события получения фокуса элементом (MouseArea / Enter)
+pub fn on_mouse_enter(app: &mut App, id: &str, prop_act: &str) {
+    log::info!("[on_mouse_enter] Вход в область: '{}' | Action: '{}'", id, prop_act);
+    
+    // Ваша бизнес-логика здесь:
+    // Навешиваем Blender-style ховер эффекты, меняя флаги подсветки в app
+}
+
+// Обработчик события потери фокуса элементом
+pub fn on_mouse_exit(app: &mut App, id: &str, prop_act: &str) {
+    log::info!("[on_mouse_exit] Выход из области: '{}' | Action: '{}'", id, prop_act);
+    
+    // Ваша бизнес-логика здесь:
+    // Сбрасываем фокус и ховер эффекты
+}

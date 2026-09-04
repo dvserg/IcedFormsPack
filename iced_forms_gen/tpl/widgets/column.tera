@@ -1,0 +1,42 @@
+{# Файл: templates/widgets/column.tera #}
+{% macro get_imports() %}
+    iced::widget::column,
+    iced::{Length, Padding, Alignment, Element, Theme},
+{% endmacro %}
+
+{# 📐 Извлекаем из ОЗУ готовый монолитный код геометрии и параметров #}
+{%- set padding_code = widget.properties | get(key="padding_code", default="") -%}
+{%- set spacing_code = widget.properties | get(key="spacing_code", default="") -%}
+
+{# 🛸 Создаем локальный массив для сбора только тех детей, у которых parent == ID этой колонки #}
+{%- set child_ids = [] -%}
+{%- for potential_child_id in widgets_order -%}
+    {%- set child_widget = widgets[potential_child_id] -%}
+    {%- if child_widget.properties and child_widget.properties.parent == id -%}
+        {%- set_global child_ids = child_ids | concat(with=potential_child_id) -%}
+    {%- endif -%}
+{%- endfor -%}
+
+column![
+    {%- for child_id in child_ids %}
+    {{ child_id }},
+    {%- endfor %}
+]
+    {# 📐 Расстояние между элементами внутри колонки #}
+    {%- if spacing_code -%}
+        .spacing({{ spacing_code }})
+    {%- endif -%}
+
+    {# 📐 Высота и Ширина колонки #}
+    {%- if widget.properties.width_code -%}.width({{ widget.properties.width_code }}){%- endif -%}
+    {%- if widget.properties.height_code -%}.height({{ widget.properties.height_code }}){%- endif -%}
+
+    {# 📐 Снайперский вывод отступов Iced 0.14 одной строкой из ОЗУ #}
+    {%- if padding_code -%}
+        .padding({{ padding_code }})
+    {%- endif -%}
+
+    {# 🎛️ Выравнивание элементов по горизонтали (если задано в VTable) #}
+    {%- if widget.properties.align_x_code -%}
+        .align_x({{ widget.properties.align_x_code }})
+    {%- endif -%}

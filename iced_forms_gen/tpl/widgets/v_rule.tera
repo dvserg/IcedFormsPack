@@ -1,0 +1,12 @@
+{# Файл: templates/widgets/v_rule.tera #}
+{% macro get_imports() %}
+    iced::widget::rule,
+    iced::{Length, Padding, Element, Theme},
+{% endmacro %}
+
+{# 📐 Извлекаем из ОЗУ готовую толщину линии (по умолчанию 1 пиксель) #}
+{%- set line_fill = widget.properties | get(key="thickness_code", default="1.0") -%}
+
+{# Инициализируем каноничную вертикальную линию Iced 0.14 с заданной толщиной [🌐] #}
+rule::vertical({{ line_fill }})
+

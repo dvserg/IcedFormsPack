@@ -1,0 +1,30 @@
+{# Файл: templates/widgets/image.tera #}
+{% macro get_imports() %}
+    iced::widget::image,
+    iced::{Length, Padding, Element, Theme},
+{% endmacro %}
+
+{# 📐 Извлекаем из ОЗУ готовый монолитный код геометрии #}
+{%- set padding_code = widget.properties | get(key="padding_code", default="") -%}
+
+{# 🗺️ Извлекаем файловый путь к картинке, подготовленный нашим ОЗУ-автоматом строк #}
+{%- set img_path = widget.properties | get(key="path_code", default="assets/placeholder.png") -%}
+
+{# Инициализируем изображение через каноничный Handle загрузки с диска в Iced 0.14 [🌐] #}
+image(iced::widget::image::Handle::from_path({{ img_path }}))
+    {# 📐 Высота и Ширина изображения #}
+    {%- if widget.properties.width_code -%}.width({{ widget.properties.width_code }}){%- endif -%}
+    {%- if widget.properties.height_code -%}.height({{ widget.properties.height_code }}){%- endif -%}
+
+    {# 📐 Снайперский вывод отступов изображения из ОЗУ #}
+    {%- if padding_code -%}
+        .padding({{ padding_code }})
+    {%- endif -%}
+
+    {# 🎛️ Метод фильтрации пикселей при масштабировании, если задан в VTable (например, "Nearest" для пиксель-арта или "Linear" для сглаживания) #}
+    {%- set filter_mode = widget.properties | get(key="filter_mode", default="") -%}
+    {%- if filter_mode == "Nearest" -%}
+        .filter_method(iced::widget::image::FilterMethod::Nearest)
+    {%- elif filter_mode == "Linear" -%}
+        .filter_method(iced::widget::image::FilterMethod::Linear)
+    {%- endif -%}

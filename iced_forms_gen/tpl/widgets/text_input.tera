@@ -1,0 +1,79 @@
+{# Файл: templates/widgets/text_input.tera #}
+{% macro get_imports() %}
+    iced::widget::text_input,
+    iced::{Length, Padding, Font, Element, Theme},
+{% endmacro %}
+
+{# Извлекаем из ОЗУ готовую геометрию #}
+{%- set padding_code = widget.properties | get(key="padding_code", default="") -%}
+
+{# ФИКС КАВЫЧЕК: Обернули дефолт в одинарные кавычки, чтобы защитить парсер Rust от сырого незакавыченного текста #}
+{%- set placeholder_text = widget.properties | get(key="placeholder_code", default='"Введите текст..."') -%}
+
+{# Извлекаем реактивное событие изменения текста #}
+{%- set action_name = widget.properties | get(key="action", default="") | trim -%}
+
+{# Извлекаем сырые параметры шрифта для функции-конструктора #}
+{%- set font_name   = widget.properties | get(key="font_family", default="System") -%}
+{%- set is_bold     = widget.properties | get(key="font_weight", default="false") -%}
+{%- set is_italic   = widget.properties | get(key="font_style", default="false") -%}
+
+text_input(
+    {# Бронебойная проверка кавычек на холсте: если бэкенд передал чистую строку — оборачиваем её #}
+    {% if widget.properties.placeholder_code %}{{ placeholder_text }}{% else %}"{{ placeholder_text }}"{% endif %},
+    {# Привязываемся к переменной String с суффиксом _state #}
+    app.state.{{ id }}_state.as_str()
+)
+    {# Навешиваем шину событий контролируемого ввода #}
+    {%- if action_name != "" and action_name != "None" -%}
+        .on_input(|val| crate::core::Message::WidgetEvent(
+            crate::core::WidgetAction::OnInputChange(
+                "{{ id }}".to_string(),
+                "{{ action_name }}".to_string(),
+                val
+            )
+        ))
+    {%- else -%}
+        .on_input(|_| crate::core::Message::NoOp)
+    {%- endif -%}
+
+    {# ШРИФТ: Полностью вычищен от капризных фильтров Tera строк #}
+    {%- if widget.properties.font_code -%}
+        .font({{ widget.properties.font_code }})
+    {%- else -%}
+        .font(crate::core::utils::create_iced_font(
+            "{{ font_name | replace(from='"', to='') }}",
+            {{ is_bold }},
+            {{ is_italic }}
+        ))
+    {%- endif -%}
+
+    {# РАЗМЕР ШРИФТА: Считываем text_size_code, который бэкенд собрал из JSON #}
+    {%- if widget.properties.text_size_code -%}
+        .size({{ widget.properties.text_size_code }})
+    {%- elif widget.properties.font_size_code -%}
+        .size({{ widget.properties.font_size_code }})
+    {%- endif -%}
+
+    {# Высота и Ширина поля ввода #}
+    {%- if widget.properties.width_code -%}.width({{ widget.properties.width_code }}){%- endif -%}
+    {%- if widget.properties.height_code -%}.height({{ widget.properties.height_code }}){%- endif -%}
+
+    {# Снайперский вывод внутренних отступов текста из ОЗУ #}
+    {%- if padding_code -%}
+        .padding({{ padding_code }})
+    {%- endif -%}
+
+    {# Выравнивание текста по оси X #}
+    {%- if widget.properties.align_x_code -%}
+        .align_x({{ widget.properties.align_x_code }})
+    {%- endif -%}
+
+    {# Перехват безопасного ввода пароля #}
+    {%- if widget.properties.secure is defined and widget.properties.secure.value_code is defined -%}
+        {%- if widget.properties.secure.value_code == "true" or widget.properties.secure.value_code == true -%}
+            .secure(true)
+        {%- endif -%}
+    {%- elif widget.properties.secure is defined and widget.properties.secure == true -%}
+        .secure(true)
+    {%- endif -%}

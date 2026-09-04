@@ -1,0 +1,52 @@
+{# Файл: templates/widgets/counter.tera #}
+{% macro get_imports() %}
+    iced::widget::{button, text, row},
+    iced::{Length, Padding, Alignment, Element, Theme},
+{% endmacro %}
+
+{# 📐 Извлекаем из ОЗУ готовый монолитный код геометрии и действий #}
+{%- set padding_code = widget.properties | get(key="padding_code", default="") -%}
+{%- set spacing_code = widget.properties | get(key="spacing_code", default="5.0") -%}
+
+{# 🛰️ Извлекаем управляющие экшены и текущее состояние счётчика #}
+{%- set action_decrement = widget.properties | get(key="action_decrement", default="") | trim -%}
+{%- set action_increment = widget.properties | get(key="action_increment", default="") | trim -%}
+{%- set current_value    = widget.properties | get(key="value", default="0") -%}
+
+row![
+    {# ➖ Кнопка уменьшения значения #}
+    button(text("-").size(16.0))
+        {%- if action_decrement != "" and action_decrement != "None" -%}
+            .on_press(crate::core::Message::{{ action_decrement }})
+        {%- else -%}
+            .on_press(crate::core::Message::NoOp)
+        {%- endif -%},
+
+    {# 📊 Центральное цифровое табло счётчика #}
+    text("{{ current_value }}")
+        .size(18.0)
+        .width(iced::Length::Fixed(40.0))
+        .align_x(iced::alignment::Horizontal::Center),
+
+    {# ➕ Кнопка увеличения значения #}
+    button(text("+").size(16.0))
+        {%- if action_increment != "" and action_increment != "None" -%}
+            .on_press(crate::core::Message::{{ action_increment }})
+        {%- else -%}
+            .on_press(crate::core::Message::NoOp)
+        {%- endif -%},
+]
+    {# 📐 Расстояние между кнопками и табло #}
+    .spacing({{ spacing_code }})
+    
+    {# 🎛️ Жесткое центрирование по вертикали, чтобы кнопки и текст стояли по линеечке #}
+    .align_items(iced::Alignment::Center)
+
+    {# 📐 Высота и Ширина всего счётчика #}
+    {%- if widget.properties.width_code -%}.width({{ widget.properties.width_code }}){%- endif -%}
+    {%- if widget.properties.height_code -%}.height({{ widget.properties.height_code }}){%- endif -%}
+
+    {# 📐 Снайперский вывод внешних отступов счётчика из ОЗУ #}
+    {%- if padding_code -%}
+        .padding({{ padding_code }})
+    {%- endif -%}
