@@ -1,0 +1,117 @@
+{# Файл: templates/widgets/checkbox.tera #}
+{# --- CHECKBOX --- #}
+
+{# Конструктор Iced 0.14: принимает строго один логический аргумент состояния #}
+checkbox( app.state.{{ id }}_checked )
+    {{- < label          props={widget.properties} /> -}}
+    {{- < width          props={widget.properties} /> -}}
+    {{- < flag_size_cbx  props={widget.properties} /> -}}
+    {{- < spacing        props={widget.properties} /> -}}
+    {{- < text_line_height props={widget.properties} /> -}}
+    {{- < font           props={widget.properties} /> -}}
+    {{- < text_size_full props={widget.properties} /> -}}
+    {{- < text_wrapping  props={widget.properties} /> -}}
+    {{- < text_shaping   props={widget.properties} /> -}}
+    {{- < checkbox_style props={widget.properties} id={id} /> -}}
+    {{- < on_toggle      widget={widget} /> -}}
+
+
+{# --- state_checkbox_declare --- #}
+{% component state_checkbox_declare(widgets_order, widgets) %}
+    {# Объявление State checkbox: Текущее состояние #}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "checkbox" %}
+            pub {{ id }}_checked: bool,
+            pub {{ id }}_label: String,
+        {%- endif -%}
+    {%- endfor -%}
+{% endcomponent %}
+
+{# --- state_checkbox_init --- #}
+{% component state_checkbox_init(widgets_order, widgets) %}
+    {# Инициализация State checkbox: Текущее состояние #}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "checkbox" %}
+            {%- set start_label = widget.properties | get(key="text_code", default='"Чекбокс"') -%}
+            {%- set start_state = widget.properties | get(key="value_code", default=widget.properties | get(key="id_checked_code", default="false")) -%}
+            {{ id }}_checked: {{ start_state }},
+            {{ id }}_label: {{ start_label }}.to_string(),
+        {%- endif -%}
+    {%- endfor -%}
+{% endcomponent %}
+
+{# --- state_checkbox_update --- #}
+{% component state_checkbox_update(widgets_order, widgets) %}
+   {% for id in widgets_order %}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "checkbox" -%}
+            if id == String::from("{{id}}") {
+                app.state.{{ id }}_checked = value;
+            }
+        {%- endif -%}
+    {% endfor %}
+{% endcomponent %}
+
+{# --- flag_size_cbx --- #}
+{% component flag_size_cbx(props) %}
+    {%- if props.flag_size_code is defined and props.flag_size_code -%}
+        .size({{ props.flag_size_code }})
+    {%- elif props.flag_size is defined and props.flag_size -%}
+        .size({{ props.flag_size }})
+    {%- endif -%}
+{% endcomponent %}
+
+
+{# --- checkbox_style --- #}
+{% component checkbox_style(props, id) %}
+    {% if props.text_color is defined or props.bg_color is defined 
+            or props.border_color is defined 
+            or props.border_width is defined 
+            or props.border_radius is defined %}
+
+        .style(move |_theme, _status| {
+            // Получаем схему 'text' для Текстовой кнопки
+            let mut base_style = checkbox::primary(_theme, _status);
+
+            {#- Цвет текста -#}
+            {%- if props.text_color_code is defined and props.text_color_code -%}
+            base_style.text_color = Some({{props.text_color_code}});
+            {%- endif -%}
+
+            {#- Цвет бордюра -#}
+            {%- if props.border_color_code is defined and props.border_color_code -%}
+            base_style.border.color = {{props.border_color_code}};
+            {%- endif -%}
+
+            {#-  Ширина бордюра -#}
+            {%- if props.border_width_code is defined and props.border_width_code -%}
+            base_style.border.width = {{props.border_width_code}};
+            {%- endif -%}
+
+            {#-  Радиус скруглений -#}
+            {%- if props.border_radius_code is defined and props.border_radius_code -%}
+            base_style.border.radius = {{props.border_radius_code}};
+            {%- endif -%}
+
+            {% if props.bg_color_code is defined and props.bg_color_code %}
+            match _status {
+                checkbox::Status::Active { is_checked: true } => {
+                    {% if props.bg_color_code != "Color::TRANSPARENT" %}
+                    base_style.background = iced::Background::Color({{props.bg_color_code}});                    
+                    {% endif %}
+                }
+                checkbox::Status::Hovered { is_checked: true } => {
+                    {% if props.bg_color_code != "Color::TRANSPARENT" %}
+                    base_style.background = iced::Background::Color({{props.bg_color_code}});                    
+                    {% endif %}
+                }
+                _ => {}
+            }
+            {% endif %}           
+            base_style
+        })
+    {% endif %}
+{% endcomponent %}
+

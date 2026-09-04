@@ -1,0 +1,78 @@
+{# Файл: templates/src/event_logic.rs.tera #}
+use ordered_float::OrderedFloat;
+use crate::core;
+use crate::app::App;
+
+
+
+// -----------------------------------------------------------------------------
+// Функции-обработчики событий элементов
+// -----------------------------------------------------------------------------
+
+
+// Обработчик нажатия кнопки
+pub fn on_press(app: &mut App, id: &str, prop_act: &str) {
+    // Выводим тестовое сообщение в консоль
+    log::info!("[on_press] Виджет: '{}' | Action: '{}'", id, prop_act);
+    
+    // Ваша бизнес-логика здесь:
+}
+
+// Обработчик событий переключателя (checkbox, toggler)
+pub fn on_toggle(app: &mut App, id: &str, prop_act: &str, value: bool) {
+    // Выводим тестовое сообщение в консоль
+    log::info!("[on_toggle] Виджет: '{}' | Action: '{}' | Флаг: {}", id, prop_act, value);
+    
+    // Ваша бизнес-логика здесь:
+
+    {#- Toggler state: Апдейт изменений -#}
+    {{- < state_toggler_update widgets_order={widgets_order} widgets={widgets} /> -}}
+
+    {#- CheckBox state: Апдейт изменений -#}
+    {{- < state_checkbox_update widgets_order={widgets_order} widgets={widgets} /> -}}
+
+}
+
+// Обработчик событий слайдера
+pub fn on_slider_change(app: &mut App, id: &str, prop_act: &str, value: OrderedFloat<f32>) {
+    // Безопасно извлекаем чистый f32 из Eq-обертки
+    let clean_f32 = value.into_inner();
+    log::info!("[on_slider_change] Виджет: '{}' | Action: '{}' | Значение: {:.2}", id, prop_act, clean_f32);
+    
+    // Ваша бизнес-логика здесь:
+
+    {#- Slider state: Апдейт изменений -#}
+    {{- < state_slider_update widgets_order={widgets_order} widgets={widgets} /> -}}
+
+}
+
+// Обработчик событий полей ввода
+pub fn on_input_change(app: &mut App, id: &str, prop_act: &str, value: String) {
+    // Выводим тестовое сообщение в консоль
+    log::info!("[on_input_change] Виджет: '{}' | Action: '{}' | Текст: '{}'", id, prop_act, &value);
+    
+    // Ваша бизнес-логика здесь (* сгруппированы по типам *):
+
+    {#- TextInput state: Апдейт изменений -#}
+    {{- < state_text_input_update widgets_order={widgets_order} widgets={widgets} /> -}}
+
+    {#- PickList state: Апдейт изменений -#}
+    {{- < state_pick_list_update widgets_order={widgets_order} widgets={widgets} /> -}}
+    
+}
+
+// Обработчик события получения фокуса элементом (MouseArea / Enter)
+pub fn on_mouse_enter(app: &mut App, id: &str, prop_act: &str) {
+    log::info!("[on_mouse_enter] Вход в область: '{}' | Action: '{}'", id, prop_act);
+    
+    // Ваша бизнес-логика здесь:
+    // Навешиваем Blender-style ховер эффекты, меняя флаги подсветки в app
+}
+
+// Обработчик события потери фокуса элементом
+pub fn on_mouse_exit(app: &mut App, id: &str, prop_act: &str) {
+    log::info!("[on_mouse_exit] Выход из области: '{}' | Action: '{}'", id, prop_act);
+    
+    // Ваша бизнес-логика здесь:
+    // Сбрасываем фокус и ховер эффекты
+}

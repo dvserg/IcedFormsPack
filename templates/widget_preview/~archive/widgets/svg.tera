@@ -1,0 +1,13 @@
+{# Файл: templates/widgets/svg.tera #}
+{# --- SVG --- #}
+
+{# Извлекаем файловый путь к картинке #}
+{%- set svg_path = widget.properties | get(key="path_code", default='"assets/placeholder.svg"') -%}
+
+{# Инициализируем векторную графику через каноничный Handle загрузки с диска #}
+svg(iced::widget::svg::Handle::from_path({{ svg_path }}))
+    {{- < width      props={widget.properties} /> -}}
+    {{- < height     props={widget.properties} /> -}}
+    {{- < content_fit props={widget.properties} /> -}}
+    {{- < opacity     props={widget.properties} /> -}}
+    {{- < rotation    props={widget.properties} /> -}}

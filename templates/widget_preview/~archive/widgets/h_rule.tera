@@ -1,0 +1,11 @@
+{# Файл: templates/widgets/h_rule.tera #}
+{# --- RULE Horizontal --- #}
+
+{# Переменные #}
+{# --- thickness - толщина линии, по умолчанию 1 пиусель --- #}
+{%- set line_fill = widget.properties | get(key="thickness_code", default="1.0") -%}
+
+{# Инициализируем горизонтальную линию с заданной толщиной #}
+rule::horizontal({{ line_fill }})
+    {# Стиль задает: цвет, заполнение, радиус скругления #}
+    {{- < rule_style props={widget.properties} /> -}}

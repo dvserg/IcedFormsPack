@@ -1,0 +1,120 @@
+{# Файл: templates/widgets/progress_bar.tera #}
+{# --- PROGRESS_BAR --- #}
+
+{# Извлекаем параметры диапазона и текущее значение шкалы #}
+{# Метод f32_code гарантирует правильную нотацию float чисел (например, "0.0") #}
+{%- set min_val = widget.properties | get(key="min_code", default=0.0) | float -%}
+{%- set max_val = widget.properties | get(key="max_code", default=100.0) | float -%}
+{%- set cur_val = widget.properties | get(key="value_f32_code", default=0.0) | float -%}
+
+{# Проверяем границы через max и min #}
+{%- set min_val = 0 if min_val < 0 else min_val -%}
+{%- set max_val = min_val if max_val < min_val else max_val -%}
+{%- set cur_val = min_val if cur_val < min_val else cur_val -%}
+{%- set cur_val = max_val if cur_val > max_val else cur_val -%}
+
+{# Конструктор progress_bar в Iced 0.14 принимает диапазон и текущее значение float #}
+progress_bar(
+    {{ min_val }}..={{ max_val }},
+    {{ cur_val }}
+)
+    {{- < length   props={widget.properties} /> -}}
+    {{- < girth    props={widget.properties} /> -}}
+    {{- < vertical props={widget.properties} /> -}}    
+    {{- < progress_bar_style props={widget.properties} /> -}}    
+
+
+{# --- state_progress_bar_declare --- #}
+{% component state_progress_bar_declare(widgets_order, widgets) %}
+    {# Объявление State progress_bar: Выбранное значение #}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "progress_bar" %}
+            pub {{ id }}_value: f32,
+        {%- endif -%}
+    {%- endfor -%}
+{% endcomponent %}
+
+{# --- state_progress_bar_init --- #}
+{% component state_progress_bar_init(widgets_order, widgets) %}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "progress_bar" %}
+
+            {%- set min_val = widget.properties | get(key="min_code", default=0.0)   | float -%}
+            {%- set max_val = widget.properties | get(key="max_code", default=100.0) | float -%}
+            {%- set cur_val = widget.properties | get(key="value_f32_code", default=0.0) | float -%}
+
+            {%- set min_val = 0 if min_val < 0 else min_val -%}
+            {%- set max_val = min_val if max_val < min_val else max_val -%}
+            {%- set cur_val = min_val if cur_val < min_val else cur_val -%}
+            {%- set cur_val = max_val if cur_val > max_val else cur_val -%}
+
+            {# Инициализация State progress_bar: Выбранное значение #}
+            {%- set id = widget.meta | get(key="id", default="") | trim -%}
+
+            {%- if widget.widget_type == "progress_bar" and id != "" %}
+                {{ id }}_value: {{cur_val}}_f32,
+            {%- endif -%}
+        {%- endif -%}
+    {%- endfor -%}
+{% endcomponent %}
+
+{# --- length --- #}
+{% component length(props) %}
+    {# length #}
+    {%- if props.length is defined and props.length -%}
+        .length({{props.length_code}})
+    {%- endif -%}
+{% endcomponent %}
+    
+{# --- girth --- #}
+{% component girth(props) %}
+    {# girth #}
+    {%- if props.girth is defined and props.girth -%}
+        .girth({{props.girth_code}})
+    {%- endif -%}
+{% endcomponent %}
+
+{# --- vertical --- #}
+{% component vertical(props) %}
+    {# vertical #}
+    {%- if props.is_vertical is defined and props.is_vertical -%}
+        .vertical()
+    {%- endif -%}
+{% endcomponent %}
+
+{# --- progress_bar_style --- #}
+{% component progress_bar_style(props) %}
+    {# progress_bar_style #}
+    {% set check_styles = [props.bg_color, props.bar_color, props.border_width, props.border_color, props.border_radius] %}
+
+    {# %- if props.bg_color is defined or props.bar_color is defined or props.border_width is defined or props.border_color is defined or props.border_radius is defined -% ##}
+    {% if check_styles | length > 0 %}
+    .style( move |_theme: &Theme| {
+        let mut base_style = progress_bar::primary(_theme);
+
+        {% if props.bg_color != "Color::TRANSPARENT" %}
+            base_style.background = iced::Background::Color({{props.bg_color_code}});
+        {%- endif -%}
+
+        {% if props.bar_color != "Color::TRANSPARENT" %}
+            base_style.bar = iced::Background::Color({{props.bar_color_code}});
+        {%- endif -%}
+
+        {% if props.border_color != "Color::TRANSPARENT" %}
+            base_style.border.color = {{props.border_color_code}};
+        {%- endif -%}
+
+        {% if props.border_width %}
+            base_style.border.width = {{props.border_width_code}};
+        {%- endif -%}
+
+        {% if props.border_radius %}
+            base_style.border.radius = {{props.border_radius_code}};
+        {%- endif -%}
+
+        base_style
+    })
+    {%- endif -%}
+{% endcomponent %}

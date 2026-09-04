@@ -1,0 +1,13 @@
+{# Файл: templates/widgets/v_rule.tera #}
+{# --- RULE Vertical --- #}
+
+{# Переменные #}
+{# --- thickness - толщина линии, по умолчанию 1 пиусель --- #}
+{%- set line_fill = widget.properties | get(key="thickness_code", default="1.0") -%}
+
+{# Инициализируем вертикальную линию с заданной толщиной #}
+rule::vertical({{ line_fill }})
+    {# Стиль задает: цвет, заполнение, радиус скругления #}
+    {{- < rule_style props={widget.properties} /> -}}
+
+    

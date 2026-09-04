@@ -1,0 +1,146 @@
+{# Файл: templates/widgets/slider.tera #}
+
+{# Извлекаем параметры диапазона и текущее значение шкалы #}
+{# Метод f32_code гарантирует правильную нотацию float чисел (например, "0.0") #}
+{%- set min_val = widget.properties | get(key="min_code", default=0.0) | float -%}
+{%- set max_val = widget.properties | get(key="max_code", default=100.0) | float -%}
+{%- set cur_val = widget.properties | get(key="value_f32_code", default=0.0) | float -%}
+
+{# Проверяем границы через max и min #}
+{%- set min_val = 0 if min_val < 0 else min_val -%}
+{%- set max_val = min_val if max_val < min_val else max_val -%}
+{%- set cur_val = min_val if cur_val < min_val else cur_val -%}
+{%- set cur_val = max_val if cur_val > max_val else cur_val -%}
+
+{# Извлекаем реактивное событие изменения выбора #}
+{%- set action_name = widget.properties | get(key="action", default="NoOp") | trim -%}
+
+{# Конструктор slider в Iced 0.14 принимает диапазон, текущее значение и замыкание/сообщение #}
+slider(
+    {{ min_val }}..={{ max_val }},
+    app.state.{{ id }}_state,
+
+    {# Если пользователь выбирает элемент, отправляем экшен, иначе NoOp-заглушку с игнорированием аргумента #}
+    {%- if action_name != "" and action_name != "None" -%}
+    move |new_val| { Message::WidgetEvent(
+        WidgetAction::OnSliderChange(
+            "{{ id }}".to_string(),
+            "{{ action_name }}".to_string(),
+            OrderedFloat(new_val),
+        )
+    )}
+    {%- else -%}
+        |_| crate::core::Message::NoOp
+    {%- endif -%}
+)
+    {{- < width        props={widget.properties} /> -}}
+    {{- < slider_step  props={widget.properties} /> -}}
+    {{- < slider_style props={widget.properties} /> -}}
+
+
+{# --- state_slider_declare --- #}
+{% component state_slider_declare(widgets_order, widgets) %}
+    {# Объявление State slider: Текущее состояние #}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "slider" %}
+            pub {{ id }}_state: f32,
+        {%- endif -%}
+    {%- endfor -%}
+{% endcomponent %}
+
+{# --- state_slider_init --- #}
+{% component state_slider_init(widgets_order, widgets) %}
+    {# Инициализация State slider: Текущее состояние #}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "slider" %}
+            {# Извлекаем параметры диапазона и текущее значение шкалы #}
+            {# Метод f32_code гарантирует правильную нотацию float чисел (например, "0.0") #}
+            {%- set min_val = widget.properties | get(key="min_code", default=0.0) | float -%}
+            {%- set max_val = widget.properties | get(key="max_code", default=100.0) | float -%}
+            {%- set cur_val = widget.properties | get(key="value_f32_code", default=0.0) | float -%}
+            {# Проверяем границы через max и min #}
+            {%- set min_val = 0 if min_val < 0 else min_val -%}
+            {%- set max_val = min_val if max_val < min_val else max_val -%}
+            {%- set cur_val = min_val if cur_val < min_val else cur_val -%}
+            {%- set cur_val = max_val if cur_val > max_val else cur_val -%}
+            
+            {{ id }}_state: {{cur_val}},
+        {%- endif -%}
+    {%- endfor -%}
+{% endcomponent %}
+
+{# --- state_slider_update --- #}
+{% component state_slider_update(widgets_order, widgets) %}
+   {% for id in widgets_order %}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "slider" -%}
+            if id == String::from("{{id}}") {
+                app.state.{{ id }}_state = value.0;
+            }
+        {%- endif -%}
+    {% endfor %}
+{% endcomponent %}
+
+
+{# --- slider_step --- #}
+{% component slider_step(props) %}
+    {%- if props.step is defined and props.step and props.step > 0 -%}
+        .step({{ props.step_code }})
+    {%- endif -%}
+{% endcomponent %}
+
+{# --- slider_style --- #}
+{% component slider_style(props) %}
+    {%- if props.bg_color is defined 
+        or props.border_width is defined
+        or props.border_color is defined
+        or props.border_radius is defined
+        or props.active_color is defined
+        or props.rail_width is defined
+        or props.handle_rectangle is defined -%}        
+        .style(move |_theme: &Theme, _status: slider::Status| {
+            let palette = _theme.extended_palette();
+            let mut base_style = slider::default(_theme, _status);
+
+            {#- Ширина полосы -#}
+            {%- if props.rail_width and props.rail_width > 0 -%}
+                base_style.rail.width = {{props.rail_width_code}};
+            {%- endif -%}
+
+            {#- Цвет полосы -#}
+            {%- if props.bg_color and props.bg_color != "Color::TRANSPARENT" -%}
+                base_style.rail.backgrounds = (iced::Background::Color( {{props.bg_color_code}} ), palette.background.strong.color.into());
+            {%- endif -%}
+
+            {#- Цвет, толщина, радиус бордера -#}
+            {%- if props.border_color is defined and props.border_color != "Color::TRANSPARENT" -%}
+                base_style.rail.border.color  = {{props.border_color_code}};
+
+                {%- if props.border_width is defined and props.border_width > 0.0 -%}
+                    base_style.rail.border.width  = {{props.border_width_code}};
+                {%- endif -%}
+
+                {%- if props.border_radius is defined and props.border_radius -%}
+                    base_style.rail.border.radius = {{props.border_radius_code}};
+                {%- endif -%}
+            {%- endif -%}
+
+            {#- Тип ползунка -#}
+            {%- if props.handle_rectangle is defined and props.handle_rectangle == true -%}
+                base_style.handle.shape = slider::HandleShape::Rectangle { 
+                    width: 8, 
+                    border_radius: 2.0.into() 
+                };
+            {%- endif -%}
+
+            {#- Цвет ползунка -#}
+            {%- if props.active_color is defined and props.active_color != "Color::TRANSPARENT" -%}
+                    base_style.handle.background = {{props.active_color_code}}.into();
+            {%- endif -%}
+
+            base_style
+        })        
+    {%- endif -%}
+{% endcomponent %}

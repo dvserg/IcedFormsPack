@@ -1,0 +1,64 @@
+{# Файл: templates/widgets/text_input.tera #}
+{# --- TEXT_INPUT --- #}
+
+{%- set placeholder_text = widget.properties | get(key="placeholder_code", default='"Введите текст..."') -%}
+
+
+text_input(
+    {# Проверка кавычек на холсте: если бэкенд передал чистую строку, оборачиваем её #}
+    {% if widget.properties.placeholder_code %}{{ placeholder_text }}{% else %}"{{ placeholder_text }}"{% endif %},
+    {# Привязываемся к переменной String с суффиксом _state #}
+    app.state.{{ id }}_state.as_str()
+)
+    {{- < width     props={widget.properties} /> -}}
+    {{- < padding   props={widget.properties} /> -}}
+    {{- < secure    props={widget.properties} /> -}}
+    {{- < font      props={widget.properties} /> -}}
+    {{- < text_size   props={widget.properties} /> -}}
+    {{- < line_height props={widget.properties} /> -}}
+    {{- < align_x     props={widget.properties} /> -}}
+    {{- < on_input    widget={widget} /> -}}
+
+
+{# --- state_text_input_declare --- #}
+{% component state_text_input_declare(widgets_order, widgets) %}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "text_input" %}
+            {# Объявление State text_input: Текущее состояние #}
+            pub {{ id }}_state: String,
+        {%- endif -%}
+    {%- endfor -%}
+{% endcomponent %}
+
+{# --- state_text_input_init --- #}
+{% component state_text_input_init(widgets_order, widgets) %}
+    {# Инициализация State text_input: Текущее состояние #}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "text_input" %}
+            {%- set value = widget.properties | get(key="value_code", default='""') -%}
+            {{ id }}_state: String::from({{value}}),
+        {%- endif -%}
+    {%- endfor -%}
+{% endcomponent %}
+
+{# --- state_text_input_update --- #}
+{% component state_text_input_update(widgets_order, widgets) %}
+   {% for id in widgets_order %}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "text_input" %}
+            if id == String::from("{{id}}") {
+                app.state.{{ id }}_state = value.clone();
+            }
+        {%- endif -%}
+    {% endfor %}
+{% endcomponent %}
+
+{# --- secure --- #}
+{% component secure(props) %}
+    {# secure #}
+    {%- if props.secure is defined and props.secure -%}
+        .secure({{props.secure_code}})
+    {%- endif -%}
+{% endcomponent %}

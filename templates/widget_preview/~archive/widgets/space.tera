@@ -1,0 +1,8 @@
+{# Файл: templates/widgets/space.tera #}
+
+
+{# Инициализируем каноничную пустую распорку Iced 0.14 #}
+space::Space::new()
+    {{- < width      props={widget.properties} /> -}}
+    {{- < height     props={widget.properties} /> -}}
+

@@ -1,0 +1,31 @@
+{# Файл: templates/widgets/row.tera #}
+{# --- ROW --- #}
+
+{# Файл: templates/widgets/row.tera #}
+{# --- ROW --- #}
+
+{# Создаем локальный массив для сбора только тех детей, у которых parent == ID этой строки #}
+{%- set child_ids = [] -%}
+{%- for potential_child_id in widgets_order -%}
+    {%- set child_widget = widgets[potential_child_id] -%}
+    {%- if child_widget.properties and child_widget.properties.parent == id -%}
+        {%- set_global child_ids = [...child_ids, potential_child_id] -%}
+    {%- endif -%}
+{%- endfor -%}
+
+{# Создаем элемент row #}
+row![
+    {%- for child_id in child_ids %}
+        {{ child_id }},
+    {%- endfor %}
+]
+    {{- < width      props={widget.properties} /> -}}
+    {{- < height     props={widget.properties} /> -}}
+    {{- < padding    props={widget.properties} /> -}}
+    {{- < spacing    props={widget.properties} /> -}}
+    {{- < align_y    props={widget.properties} /> -}}
+    {{- < width      props={widget.properties} /> -}}
+    {{- < height     props={widget.properties} /> -}}
+    {{- < padding    props={widget.properties} /> -}}
+    {{- < spacing    props={widget.properties} /> -}}
+    {{- < align_y    props={widget.properties} /> -}}

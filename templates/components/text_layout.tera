@@ -1,0 +1,94 @@
+{# Файл: templates/components/text_layout.tera #}
+{# ПРАВИЛО: Сначала проверяем модифицированные предпарсингом данные 'xxx_code', потом оригинальные 'xxx' #}
+
+{# Расположение #}
+
+{# --- wrapping --- #}
+{% component wrapping(props) %}
+    {# wrapping #}
+    {%- if props.wrapping_code is defined and props.wrapping_code -%}
+        .wrapping(iced::widget::text::Wrapping::Word)
+    {%- elif props.wrapping is defined and props.wrapping -%}
+        .wrapping(iced::widget::text::Wrapping::Word)
+    {%- endif -%}
+{% endcomponent %}
+
+{# --- shaping --- #}
+{% component shaping(props) %}
+    {# shaping #}
+    {%- if props.shaping_code is defined and props.shaping_code -%}
+        .shaping(iced::widget::text::Shaping::Advanced)
+    {%- elif props.shaping is defined and props.shaping -%}
+        .shaping(iced::widget::text::Shaping::Advanced)
+    {%- endif -%}
+{% endcomponent %}
+
+{# --- text_wrapping --- #}
+{% component text_wrapping(props) %}
+    {# text_wrapping #}
+    {%- if props.text_wrapping_code is defined and props.text_wrapping_code -%}
+        .text_wrapping(iced::widget::text::Wrapping::Word)
+    {%- elif props.text_wrapping is defined and props.text_wrapping -%}
+        .text_wrapping(iced::widget::text::Wrapping::Word)
+    {%- elif props.wrapping_code is defined and props.wrapping_code -%}
+        .text_wrapping(iced::widget::text::Wrapping::Word)
+    {%- elif props.wrapping is defined and props.wrapping -%}
+        .text_wrapping(iced::widget::text::Wrapping::Word)
+    {%- endif -%}
+{% endcomponent %}
+
+{# --- text_shaping --- #}
+{% component text_shaping(props) %}
+    {# text_shaping #}
+    {%- if props.text_shaping_code is defined and props.text_shaping_code -%}
+        .text_shaping(iced::widget::text::Shaping::Advanced)
+    {%- elif props.text_shaping is defined and props.text_shaping -%}
+        .text_shaping(iced::widget::text::Shaping::Advanced)
+    {%- elif props.shaping_code is defined and props.shaping_code -%}
+        .text_shaping(iced::widget::text::Shaping::Advanced)
+    {%- elif props.shaping is defined and props.shaping -%}
+        .text_shaping(iced::widget::text::Shaping::Advanced)
+    {%- endif -%}
+{% endcomponent %}
+
+{# --- text_line_height --- #}
+{% component text_line_height(props) %}
+    {%- if props.text_line_height is defined and props.text_line_height -%}
+        .text_line_height(text::LineHeight::Relative({{ props.text_line_height_code }}))
+    {%- elif props.line_height is defined and props.line_height -%}
+        .text_line_height(text::LineHeight::Relative({{ props.line_height_code }}))
+    {%- endif -%}
+{% endcomponent %}
+
+{# --- line_height --- #}
+{% component line_height(props) %}
+    {%- if props.text_line_height is defined and props.text_line_height -%}
+        .line_height(text::LineHeight::Relative({{ props.text_line_height_code }}))
+    {%- elif props.line_height is defined and props.line_height -%}
+        .line_height(iced::widget::text::LineHeight::Relative({{ props.line_height_code }}))
+    {%- endif -%}
+{% endcomponent %}
+
+{# Размер текста|шрифта #}
+{# --- text_size | text_size_code | fort_size | fort_size_code --- #}
+{% component text_size(props) %}
+    {%- if props.text_size_code is defined and props.text_size_code -%}
+        .size({{ props.text_size_code }})
+    {%- elif props.text_size is defined and props.text_size -%}
+        .size({{ props.text_size }})
+    {%- elif props.font_size_code is defined and props.font_size_code -%}
+        .size({{ props.font_size_code }})
+    {%- elif props.font_size is defined and props.font_size -%}
+        .size({{ props.font_size }})
+    {%- endif -%}
+{% endcomponent %}
+
+
+{# --- text_size_full --- #}
+{% component text_size_full(props) %}
+    {%- if props.text_size_code is defined and props.text_size_code -%}
+        .text_size({{ props.text_size_code }})
+    {%- elif props.text_size is defined and props.text_size -%}
+        .text_size({{ props.text_size }})
+    {%- endif -%}
+{% endcomponent %}

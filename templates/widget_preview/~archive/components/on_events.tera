@@ -1,0 +1,55 @@
+{# Файл: templates/components/on_events.tera #}
+{# ПРАВИЛО: Сначала проверяем модифицированные предпарсингом данные 'xxx_code', потом оригинальные 'xxx' #}
+
+
+{# --- on_toggle --- #}
+{% component on_toggle(widget) %}
+    {% set id = widget.meta.id %}
+    {% set props = widget.properties %}
+
+    {% set action = "NoOp" %}
+    {%- if props.action is defined -%}
+        {% set_global action = props.action_code %}
+    {%- endif -%}
+
+    .on_toggle(move |new_val: bool| Message::WidgetEvent( 
+        WidgetAction::OnToggle(
+            String::from("{{id}}"), 
+            String::from("{{action}}"), 
+            new_val,
+        )
+    ))    
+{% endcomponent %}
+
+{# --- on_press --- #}
+{% component on_press(widget) %}
+    {% set id = widget.meta.id %}
+    {% set props = widget.properties %}
+
+    {% set action = "NoOp" %}
+    {%- if props.action is defined -%}
+        {% set_global action = props.action_code %}
+    {%- endif -%}
+
+    .on_press(Message::WidgetEvent(WidgetAction::OnPress(String::from("{{id}}"), String::from("{{action}}"))))
+{% endcomponent %}
+
+{# --- on_input --- #}
+{% component on_input(widget) %}
+    {% set id = widget.meta.id %}
+    {% set props = widget.properties %}
+
+    {% set action = "NoOp" %}
+    {%- if props.action is defined -%}
+        {% set_global action = props.action_code %}
+    {%- endif -%}
+
+    .on_input(move |new_val: String| Message::WidgetEvent( 
+        WidgetAction::OnInputChange(
+            String::from("{{id}}"), 
+            String::from("{{action}}"), 
+            new_val,
+        )
+    ))    
+{% endcomponent %}
+

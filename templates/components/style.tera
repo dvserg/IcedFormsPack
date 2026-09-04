@@ -1,0 +1,107 @@
+{# Файл: templates/components/style.tera #}
+{# ПРАВИЛО: Сначала проверяем модифицированные предпарсингом данные 'xxx_code', потом оригинальные 'xxx' #}
+
+
+{# --- rule_style --- #}
+{% component rule_style(props) %}
+    {% if props.fill_percent is defined or props.color is defined or props.border_radius is defined %}
+        .style(move |theme: &Theme| {
+            use iced::widget::rule::FillMode;
+            
+            // Получаем схему по умолчанию для rule
+            let mut base_style = rule::default(theme);
+    
+            {%- if props.color_code is defined and props.color_code %}
+            base_style.color = {{props.color_code}};
+            {%- endif %}
+
+            {%- if props.fill_percent_code is defined and props.fill_percent_code %}
+                {% if props.fill_percent == 100.0 %}
+                base_style.fill_mode = FillMode::Full;
+                {% else %}
+                base_style.fill_mode = FillMode::Percent({{props.fill_percent_code}});
+                {%- endif %}
+            {%- endif %}
+
+            {%- if props.border_radius_code is defined and props.border_radius_code %}
+            base_style.radius = {{props.border_radius_code}};
+            {%- endif %}
+            base_style
+        })
+    {% endif %}
+{% endcomponent %}
+
+
+{# --- button_style --- #}
+{% component button_style(props) %}
+    {% if props.text_color is defined or props.bg_color is defined or props.border_color is defined or props.border_width is defined or props.border_radius is defined %}
+        .style(move |_theme, _status| {
+
+            {# Получаем схему 'text' для Текстовой кнопки #}
+            let mut base_style = button::text(_theme, _status);
+
+            {#- Цвет текста -#}
+            {%- if props.text_color_code is defined and props.text_color_code -%}
+            base_style.text_color = {{props.text_color_code}};
+            {%- endif -%}
+
+            {#- Фоновый цвет -#}
+            {%- if props.bg_color_code is defined and props.bg_color_code -%}
+            base_style.background = Some( iced::Background::Color({{props.bg_color_code}}) );
+            {%- endif -%}
+            
+            {# Цвет бордюра #}
+            {%- if props.border_color_code is defined and props.border_color_code -%}
+            base_style.border.color = {{props.border_color_code}};
+            {%- endif -%}
+            
+            {#  Ширина бордюра #}
+            {%- if props.border_width_code is defined and props.border_width_code -%}
+            base_style.border.width = {{props.border_width_code}};
+            {%- endif -%}
+
+            {#  Радиус скруглений #}
+            {%- if props.border_radius_code is defined and props.border_radius_code -%}
+            base_style.border.radius = {{props.border_radius_code}};
+            {%- endif -%}
+
+            base_style
+        })
+    {% endif %}
+{% endcomponent %}
+
+
+{# --- container_style --- #}
+{% component container_style(props) %}
+    {% if props.bg_color is defined or props.border_color is defined or props.border_width is defined or props.border_radius is defined %}
+        .style(move |_theme| {
+
+            {# Получаем схему 'transparent' для container #}
+            let mut base_style = container::transparent(_theme);
+
+            {#- Фоновый цвет -#}
+            {%- if props.bg_color_code is defined and props.bg_color_code -%}
+            base_style.background = Some( iced::Background::Color({{props.bg_color_code}}) );
+            {%- endif -%}
+            
+            {# Цвет бордюра #}
+            {%- if props.border_color_code is defined and props.border_color_code -%}
+            base_style.border.color = {{props.border_color_code}};
+            {%- endif -%}
+            
+            {#  Ширина бордюра #}
+            {%- if props.border_width_code is defined and props.border_width_code -%}
+            base_style.border.width = {{props.border_width_code}};
+            {%- endif -%}
+
+            {#  Радиус скруглений #}
+            {%- if props.border_radius_code is defined and props.border_radius_code -%}
+            base_style.border.radius = {{props.border_radius_code}};
+            {%- endif -%}
+
+            base_style
+        })
+    {% endif %}
+{% endcomponent %}
+
+
