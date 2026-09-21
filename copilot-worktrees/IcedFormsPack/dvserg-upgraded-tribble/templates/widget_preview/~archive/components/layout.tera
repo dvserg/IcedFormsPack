@@ -1,0 +1,22 @@
+{# Файл: templates/components/layout.tera #}
+{# ПРАВИЛО: Сначала проверяем модифицированные предпарсингом данные 'xxx_code', потом оригинальные 'xxx' #}
+
+{# Расположение #}
+
+{# --- padding --- #}
+{% component padding(props) %}
+    {%- if props.padding_code is defined and props.padding_code -%}
+        .padding({{ props.padding_code }})
+    {%- elif props.padding is defined and props.padding -%}
+        .padding({{ props.padding }})
+    {%- endif -%}
+{% endcomponent %}
+
+{# --- spacing --- #}
+{% component spacing(props) %}
+    {%- if props.spacing_code is defined and props.spacing_code -%}
+        .spacing({{ props.spacing_code }})
+    {%- elif props.spacing is defined and props.spacing -%}
+        .spacing({{ props.spacing }})
+    {%- endif -%}
+{% endcomponent %}

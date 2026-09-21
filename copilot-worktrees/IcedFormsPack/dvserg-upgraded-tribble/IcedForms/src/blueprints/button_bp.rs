@@ -1,0 +1,366 @@
+// -----------------------------------------------------------------------------
+// Виджет 'button'
+// Содержит в себе контент: виджет 'text'.
+// Ведет себя как стандартная кнопка
+// -----------------------------------------------------------------------------
+//use std::cell::{RefCell};
+use std::rc::Rc;
+use iced::border::Radius;
+use iced::widget::{button, text};
+use iced::{Color, Element, Length, Padding, Theme};
+//use log::{info, warn};
+
+//use crate::blueprints::*;
+use crate::core::*;
+use crate::core::{MenuAction, Message};
+
+// -----------------------------------------------------------------------------
+// Автоматически регистрируем blueprint в реестре
+// -----------------------------------------------------------------------------
+// Передаем функцию без круглых скобок (как указатель)
+inventory::submit! {
+    AutoRegisteredWidget {
+        name: ButtonBlueprint::WIDGET_TYPE, //"button",
+        category: CAT_BASE,
+        constructor: create_button_creator,
+    }
+}
+
+// Функция-помощник для создания Arc (вызовется автоматически внутри Factory::default)
+fn create_button_creator() -> Box<dyn WidgetCreator + Send + Sync> {
+    log::info!("Авторегистрация '{}'", "Button");
+    Box::new(ButtonCreator)
+}
+
+// Конструктор blueprint для виджета
+#[derive(Debug)]
+pub struct ButtonCreator;
+
+impl WidgetCreator for ButtonCreator {
+    fn create_blueprint(&self, id: String) -> Rc<dyn WidgetBlueprint> {
+        //let blueprint = ButtonBlueprint::new(id, "create_widget".to_string());
+        //Rc::new(blueprint) as Rc<dyn WidgetBlueprint>
+        Rc::new(ButtonBlueprint::new(id, "create_widget".to_string()))
+    }
+}
+// -----------------------------------------------------------------------------
+
+// Структура для распарсенных свойств кнопки
+#[derive(Debug, Clone)]
+pub struct ButtonProps {
+    pub action: String,
+    pub text: String,
+    //pub scale:          f32,
+    pub width: Length,
+    pub height: Length,
+    pub padding: Padding,
+
+    //pub font_family: String,
+    //pub text_size: Pixels,
+    //pub font_weight: bool,
+    //pub font_style: bool,
+    //pub wrapping: bool,
+    //pub shaping: bool,
+
+    //pub line_height: f32,
+    pub text_color: Color,
+
+    pub bg_color: Color,
+    pub border_radius: Radius,
+    pub border_width: f32,
+    pub border_color: Color,
+}
+
+#[derive(Debug, Clone)]
+pub struct ButtonBlueprint {
+    pub meta:  CommonWidgetMeta,
+    //pub props: RefCell<ButtonProps>,
+}
+
+impl HasCommonMeta for ButtonBlueprint {
+    fn get_meta(&self) -> &CommonWidgetMeta {
+        &self.meta
+    }
+    fn get_meta_mut(&mut self) -> &mut CommonWidgetMeta {
+        &mut self.meta
+    }
+}
+
+impl ButtonBlueprint {
+    // Присваиваем константное имя этого блюпринта
+    const WIDGET_TYPE: &'static str = "button";
+
+    // Конструктор чертежа кнопки
+    pub fn new(id: String, _action: String) -> Self {
+        Self {
+            meta:  CommonWidgetMeta::new(id),
+            //props: ButtonProps::default().into(),
+        }
+    }
+
+    // ВЫНЕСЕННАЯ ФУНКЦИЯ ПАРСИНГА СВОЙСТВ
+    fn parse_props<'a>(&self, factory: &'a Factory) -> ButtonProps {
+        // Идентификатор виджета
+        let widget_id = self.get_id();
+
+        // Получаем дефолтные свойства
+        let def = ButtonProps::default();
+
+        //let test: String =  factory.get(&widget_id, PROP_TEXT).unwrap_or_default();
+        //println!("Props: {:?}", test);
+
+        let text:   String = factory.get_or_set(&widget_id, PROP_TEXT,   "Виджет 'button'".to_string());
+        let action: String = factory.get_or_set(&widget_id, PROP_ACTION, "".to_string());
+
+        // Адаптивные размеры (по умолчанию сжиматься по тексту — Shrink)
+        let width:   Length  = factory.get_or_set(&widget_id, PROP_WIDTH,   def.width);
+        let height:  Length  = factory.get_or_set(&widget_id, PROP_HEIGHT,  def.height);
+        let padding: Padding = factory.get_or_set(&widget_id, PROP_PADDING, def.padding);
+
+        //let font_family: String = factory.get_or_set(&widget_id, PROP_FONT_FAMILY, def.font_family);
+        //let text_size:   Pixels = factory.get_or_set(&widget_id, PROP_TEXT_SIZE,   def.text_size);
+        //let font_weight: bool   = factory.get_or_set(&widget_id, PROP_FONT_WEIGHT, def.font_weight);
+        //let font_style:  bool   = factory.get_or_set(&widget_id, PROP_FONT_STYLE,  def.font_style);
+
+        //let wrapping: bool = factory.get_or_set(&widget_id, PROP_WRAPPING, def.wrapping);
+        //let shaping:  bool = factory.get_or_set(&widget_id, PROP_SHAPING,  def.shaping);
+
+        //let line_height: f32   = factory.get_or_set(&widget_id, PROP_LINE_HEIGHT, def.line_height);
+        let text_color:  Color = factory.get_or_set(&widget_id, PROP_TEXT_COLOR,  def.text_color); //Color::from_rgb(0.1, 0.1, 0.1));  //def.text_color); //Color::from_rgb(0.06, 0.09, 0.15));
+
+        // Стиль контейнера
+        let bg_color:      Color  = factory.get_or_set(&widget_id, PROP_BG_COLOR,      def.bg_color/*Color::from_rgb(0.9, 0.9, 0.9)*/); //def.bg_color); // Мягкий светло-серый фон
+        let border_radius: Radius = factory.get_or_set(&widget_id, PROP_BORDER_RADIUS, Radius::from(4.0_f32)); // Скругление углов
+        let border_width:  f32    = factory.get_or_set(&widget_id, PROP_BORDER_WIDTH,  1.0_f32);
+        let border_color:  Color  = factory.get_or_set(&widget_id, PROP_BORDER_COLOR,  Color::from_rgb(0.7, 0.7, 0.7));
+
+        ButtonProps {
+            action,
+            text,
+            //scale,
+            width,
+            height,
+            padding,
+
+            //font_family,
+            //text_size,
+            //font_weight,
+            //font_style,
+            //wrapping,
+            //shaping,
+
+            //line_height,
+            text_color,
+
+            bg_color,
+            border_radius,
+            border_width,
+            border_color,
+        }
+    }
+}
+
+impl Default for ButtonProps {
+    // Присваиваем дефолтные значения Iced для контроля пропущенных значений и значений по умолчанию в инспекторе
+    fn default() -> ButtonProps {
+        let system_palette = iced::Theme::Light.palette();
+
+        ButtonProps {
+            action:         "".to_string(),
+            text:           "".to_string(),
+
+            width:          Length::Shrink,
+            height:         Length::Shrink,
+            padding:        Padding::from([4.0, 8.0]),
+
+            //font_family:    "System".to_string(),
+            //text_size:      Pixels(16.0),
+            //font_weight:    false,
+            //font_style:     false,
+            //wrapping:       false,
+            //shaping:        false,
+
+            //line_height:    1.0_f32,
+            text_color:     system_palette.text,//Color::TRANSPARENT,
+
+            bg_color:       system_palette.background,
+            border_radius:  Radius::from(2.0_f32),
+            border_color:   Color::TRANSPARENT,
+            border_width:   0.0_f32,
+        }
+    }    
+}
+
+// Реализуем контракт интерфейса фабрики
+impl WidgetBlueprint for ButtonBlueprint {
+    fn widget_type(&self) -> &'static str {
+        Self::WIDGET_TYPE
+    }
+
+    // Декларация свойств для инспектора
+    // Порядок следования свойств соответствует списку
+    fn editable_properties(&self) -> Vec<PropertyKey> {
+        vec![
+            PROP_ACTION,
+            PROP_TEXT,
+            //PROP_SCALE,
+            PROP_WIDTH,
+            PROP_HEIGHT,
+            PROP_PADDING,
+            //PROP_FONT_FAMILY,
+            //PROP_TEXT_SIZE,
+            //PROP_FONT_WEIGHT,
+            //PROP_FONT_STYLE,
+            //PROP_WRAPPING,
+            //PROP_SHAPING,
+            //PROP_LINE_HEIGHT,
+            PROP_TEXT_COLOR,
+            PROP_BG_COLOR,
+            PROP_BORDER_RADIUS,
+            PROP_BORDER_WIDTH,
+            PROP_BORDER_COLOR,
+        ]
+    }
+
+    // Реализация апдейта собственных свойств блюпринта из VTable
+    //crate::impl_refresh_props!(ButtonBlueprint, ButtonProps);
+
+    fn build_element<'a>(
+        &'a self,
+        factory: &'a Factory,
+        selected_id: Option<&str>,
+    ) -> Element<'a, Message, Theme> {
+        // Получаем чистые типизированные свойства
+        //let props = self.props.borrow(); //self.parse_props(factory);
+        let props = self.parse_props(factory);
+        let def   = ButtonProps::default();
+
+        // *** ИНФОРМАЦИЯ ПО .fluid() ***
+        // Автоматическое определение размеров бокса виджета текста в кнопке
+        // Правило для размеров текста:
+        //      Если кнопка имеет жесткий размер Fixed или растягивается на Fill —
+        //      тексту безопасно выставить Fill. Благодаря этому рамка текста займет
+        //      максимум места внутри кнопки, а методы .align_x сцентрируют буквы безупречно.
+        // КРИТИЧЕСКОЕ ГРАНИЧНОЕ УСЛОВИЕ: Кнопка сжимается (Shrink).
+        //      Текст ОБЯЗАН стать Shrink, иначе расчет размеров зайдет в бесконечный цикл.
+
+        // Метод .fluid() из самого Iced автоматически сделает Shrink для сжимающихся кнопок,
+        // предотвращая бесконечный цикл, а для остальных вернет Fill.
+        //let current_text_width = props.width.fluid();
+        //let current_text_height = props.height.fluid();
+
+        
+        // Виджет 'button'
+        // Вызов button(text(...)) аналогичен button(...), т.к. под капотом именно так и происходит
+        // Такая форма здесь нужна для исключения танцев с borrow и timelife
+        let mut w_button = button(text(props.text.clone()))
+            .width(props.width)
+            .height(props.height)
+            .padding(props.padding)            
+            .style(move |_theme, _status| {
+                // Берем готовую 'text' тему и меняем только то, что нам нужно
+                let mut base_style = button::text(_theme, _status);
+
+                // Применяем только действительный цвет
+                // Если указан прозрачный цвет - оставляем дефолтный
+                if props.text_color != Color::TRANSPARENT {
+                    base_style.text_color = props.text_color;
+                }
+                if props.bg_color != Color::TRANSPARENT {
+                    base_style.background = Some(iced::Background::Color(props.bg_color));
+                }
+                if props.border_color != Color::TRANSPARENT {
+                    base_style.border.color = props.border_color;
+                }
+                if props.border_width != def.border_width {
+                    base_style.border.width = props.border_width;
+                }
+                if props.border_radius != def.border_radius {
+                    base_style.border.radius = props.border_radius;
+                }
+                
+                base_style
+        });
+
+        // Назначить события для 'button' в режимах конструктора и пользователя
+        if factory.is_design_mode() {
+            // -------------------------------------------------------------
+            // РЕЖИМ КОНСТРУКТОРА: Событие выделения виджета
+            // -------------------------------------------------------------
+            w_button =
+                w_button.on_press(Message::MenuEvent(MenuAction::SelectWidget(self.get_id())));
+        } else {
+            // -------------------------------------------------------------
+            // РЕЖИМ РАБОТЫ: Интерактивное событие нажатия
+            // -------------------------------------------------------------
+            //let action_string = props.action.to_string();
+
+            //        w_button = w_button.on_press(Message::ValueChanged {
+            //            id: self.get_id(),
+            //            new_value: action_string,
+            //        })
+        }
+
+        // Приводим виджет к тип 'Element'
+        let element: Element<'a, Message, Theme> = w_button.into();
+
+        //use crate::core::design_proxy::design_proxy;
+        //let element: Element<'a, Message, Theme> = design_proxy(w_button, true).into();
+
+        // В самом конце применяем магию подсветки из трейта в режиме конструктора        
+        apply_design_overlay(
+            element,
+            factory.is_design_mode(),
+            selected_id,
+            &self.get_id(),
+        )
+    }
+
+    // Функция возвращает динамический список имен свойств для экспорта
+    // Возвращаются только имена свойств с недефолтныи значениями, которые нужно сохранить в JSON
+    // Свойства с дефолтными значениями отсекаются
+    fn get_exportable_property_names(&self, factory: &Factory) -> Vec<PropertyKey> {
+        let mut prop_names = Vec::new();
+
+        // Получаем текущие свойства виджета
+        let current = self.parse_props(factory);
+        
+        // Получаем дефолтные свойства для сравнения
+        let default = ButtonProps::default();
+
+        // Сравниваем каждое поле структуры
+        // Отличные от дефолтного пушим в вектор для экспорта
+        if current.action != default.action {
+            prop_names.push(PROP_ACTION);
+        }
+        if current.text != default.text {
+            prop_names.push(PROP_TEXT);
+        }
+        if current.width != default.width {
+            prop_names.push(PROP_WIDTH);
+        }
+        if current.height != default.height {
+            prop_names.push(PROP_HEIGHT);
+        }
+        if current.padding != default.padding {
+            prop_names.push(PROP_PADDING);
+        }
+        if current.text_color != default.text_color {
+            prop_names.push(PROP_TEXT_COLOR);
+        }
+        if current.bg_color != default.bg_color {
+            prop_names.push(PROP_BG_COLOR);
+        }
+        if current.border_radius != default.border_radius {
+            prop_names.push(PROP_BORDER_RADIUS);
+        }
+        if current.border_width != default.border_width {
+            prop_names.push(PROP_BORDER_WIDTH);
+        }
+        if current.border_color != default.border_color {
+            prop_names.push(PROP_BORDER_COLOR);
+        }
+
+        prop_names
+    }
+}

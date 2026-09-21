@@ -1,0 +1,14 @@
+{# Файл: templates/widgets/text.tera #}
+{# --- TEXT --- #}
+
+{# Генерируем код текста Iced #}
+iced::widget::text({{ widget.properties | get(key="text_content_code", default=widget.properties | get(key="text_code", default='"Текст"')) }})
+    {{- < width      props={widget.properties} /> -}}
+    {{- < height     props={widget.properties} /> -}}
+    {{- < text_color props={widget.properties} /> -}}
+    {{- < font       props={widget.properties} /> -}}
+    {{- < text_size  props={widget.properties} /> -}}
+    {{- < wrapping   props={widget.properties} /> -}}
+    {{- < shaping    props={widget.properties} /> -}}
+    {{- < align_x    props={widget.properties} /> -}}
+    {{- < align_y    props={widget.properties} /> -}}

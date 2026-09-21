@@ -1,0 +1,26 @@
+{# Файл: templates/components/text_font.tera #}
+{# ПРАВИЛО: Сначала проверяем модифицированные предпарсингом данные 'xxx_code', потом оригинальные 'xxx' #}
+
+{# Шрифт #}
+{# --- font_family, font_weight, font_style --- #}
+{% component font(props) %}
+    {%- if props.font_family_code is defined or props.font_weight is defined or props.font_style_code is defined -%}
+
+        {# Извлекаем сырые параметры шрифта внутри макроса #}
+        {%- set font_name   = props | get(key="font_family", default="System") -%}
+        {%- set is_bold     = props | get(key="font_weight", default="false") -%}
+        {%- set is_italic   = props | get(key="font_style",  default="false") -%}
+
+        {# Генерируем код метода .font() #}
+        {%- if props.font_code is defined and props.font_code -%}
+            .font({{ props.font_code | safe }})
+        {%- else -%}
+            .font(crate::core::utils::create_iced_font(
+                "{{ font_name | replace(from='"', to='') }}", 
+                {{ is_bold }}, 
+                {{ is_italic }}
+            ))
+        {%- endif -%}
+
+    {%- endif -%}
+{% endcomponent %}

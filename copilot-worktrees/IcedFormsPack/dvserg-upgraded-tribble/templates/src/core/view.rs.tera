@@ -1,0 +1,99 @@
+{# Файл: templates/src/core/view.rs.tera #}
+// -----------------------------------------------------------------------------
+// Динамические импорты
+// -----------------------------------------------------------------------------
+{{ iced_imports_block | safe }}
+// -----------------------------------------------------------------------------
+
+use crate::app::App;
+use crate::core::{Message, WidgetAction, utils};
+
+pub fn render_workspace<'a>(app: &'a App) -> Element<'a, Message, Theme> {
+    {# Импорт применяем по месту чтобы не конфликтовать с глобальным импортом #}
+    use iced::widget::column;
+    
+    // Линейная сборка элементов от перифирии к корню
+    
+{% for id in widgets_order %}
+    {%- set widget = widgets[id] -%}
+    {%- set w_type = widget.widget_type | default(value=widget.type | default(value="space")) -%}
+
+    {# Fix: Явно прописываем Element<'_, Message, Theme> для каждой переменной! #}
+     
+    let {{ id }}: Element<'_, Message, Theme> = 
+    {%- if w_type == "text" -%}
+        {%- include "widgets/text.tera" -%}
+    {%- elif w_type == "button" -%}
+        {%- include "widgets/button.tera" -%}
+    {%- elif w_type == "button_box" -%}
+        {%- include "widgets/button_box.tera" -%}
+    {%- elif w_type == "checkbox" -%}
+        {%- include "widgets/checkbox.tera" -%}
+    {%- elif w_type == "column" -%}
+        {%- include "widgets/column.tera" -%}
+    {%- elif w_type == "container" -%}
+        {%- include "widgets/container.tera" -%}
+    {%- elif w_type == "h_rule" -%}
+        {%- include "widgets/h_rule.tera" -%}
+    {%- elif w_type == "image" -%}
+        {%- include "widgets/image.tera" -%}
+    {%- elif w_type == "mouse_area" -%}
+        {%- include "widgets/mouse_area.tera" -%}
+    {%- elif w_type == "pick_list" -%}
+        {%- include "widgets/pick_list.tera" -%}
+    {%- elif w_type == "progress_bar" -%}
+        {%- include "widgets/progress_bar.tera" -%}
+    {%- elif w_type == "qr_code" -%}
+        {%- include "widgets/qr_code.tera" -%}
+    {%- elif w_type == "radio" -%}
+        {%- include "widgets/radio.tera" -%}
+    {%- elif w_type == "row" -%}
+        {%- include "widgets/row.tera" -%}
+    {%- elif w_type == "scrollable" -%}
+        {%- include "widgets/scrollable.tera" -%}
+    {%- elif w_type == "slider" -%}
+        {%- include "widgets/slider.tera" -%}
+    {%- elif w_type == "space" -%}
+        {%- include "widgets/space.tera" -%}
+    {%- elif w_type == "stack" -%}
+        {%- include "widgets/stack.tera" -%}
+    {%- elif w_type == "svg" -%}
+        {%- include "widgets/svg.tera" -%}
+    {%- elif w_type == "text_input" -%}
+        {%- include "widgets/text_input.tera" -%}
+    {%- elif w_type == "toggler" -%}
+        {%- include "widgets/toggler.tera" -%}
+    {%- elif w_type == "v_rule" -%}
+        {%- include "widgets/v_rule.tera" -%}
+
+    {# При неопознанном виджете используем заменитель Space #}
+    {%- else -%}
+        space::Space::new().width(0.0).height(0.0)
+    {%- endif -%}
+    .into();
+
+{% endfor %}
+
+
+    // Сборка корня (Объединение множества корней в column![])
+    let element: Element<'a, Message, Theme> = 
+    {%- if root_ids | length > 1 -%}
+        {# Сценарий А: Корней много! Упаковываем их в красивую монолитную колонку Iced #}
+        column![
+        {%- for root_id in root_ids -%}
+            {{ root_id }},
+        {%- endfor -%}
+        ].into();
+    {%- elif root_ids | length == 1 -%}
+        {# Сценарий Б: Корень всего один выводим его напрямую без лишних оберток #}
+        {{ root_ids | first }};
+    {%- elif last_widget_id != "" -%}
+        {# Сценарий В: Аварийный откат, если parent_id сломался, выводим последний созданный узел #}
+        {{ last_widget_id }};
+    {%- else -%}
+        {# Сценарий Г: Холст абсолютно пуст — отдаем невидимую safe-распорку #}
+        space::Space::new().width(0.0).height(0.0).into();
+    {%- endif -%} 
+
+    element
+}

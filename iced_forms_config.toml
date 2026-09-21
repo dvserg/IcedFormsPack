@@ -5,4 +5,4 @@ template_include = [
     "widgets",
 ]
 template_config = "./widget_config.toml"
-theme_style = "Blender"
+theme_style = "VSCode"

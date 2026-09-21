@@ -290,7 +290,7 @@ pub struct WidgetNode {
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
 pub struct CadProject {
-    pub field_counter: usize,
+    pub widget_counter: usize,
     #[serde(rename = "types_registry")]
     pub property_registry: PropertyRegistry,
     pub widgets: IndexMap<String, WidgetNode>,
@@ -300,7 +300,7 @@ pub struct CadProject {
 impl CadProject {
     pub fn new() -> Self {
         Self {
-            field_counter: 0,
+            widget_counter: 0,
             property_registry: PropertyRegistry::new(),
             widgets: IndexMap::new(),
             widgets_order: Vec::new(),

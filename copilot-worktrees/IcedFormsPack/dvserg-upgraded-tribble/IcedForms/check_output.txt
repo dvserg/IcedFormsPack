@@ -1,0 +1,411 @@
+﻿cargo :     Checking IcedForms v0.1.0 (D:\Rust\iced-widgets\IcedForms_workspace\IcedForms)
+строка:2 знак:1
++ cargo check --manifest-path D:\Rust\iced-widgets\IcedForms_workspace\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (    Checking Ic...pace\IcedForms):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error[E0425]: cannot find function `to_value` in crate `tera`
+  --> IcedForms\src\core\codegen.rs:13:35
+   |
+13 |     map.insert("id".into(), tera::to_value(widget_id).unwrap());
+   |                                   ^^^^^^^^ not found in `tera`
+
+error[E0425]: cannot find function `to_value` in crate `tera`
+  --> IcedForms\src\core\codegen.rs:19:19
+   |
+19 |             tera::to_value(bp.widget_type().to_string()).unwrap(),
+   |                   ^^^^^^^^ not found in `tera`
+
+error[E0425]: cannot find function `to_value` in crate `tera`
+  --> IcedForms\src\core\codegen.rs:28:65
+   |
+28 |             props_map.insert(key.name.to_string().into(), tera::to_value(val).unwrap());
+   |                                                                 ^^^^^^^^ not found in `tera`
+
+error[E0425]: cannot find function `to_value` in crate `tera`
+  --> IcedForms\src\core\codegen.rs:30:42
+   |
+30 |         map.insert("props".into(), tera::to_value(props_map).unwrap());
+   |                                          ^^^^^^^^ not found in `tera`
+
+error[E0425]: cannot find function `to_value` in crate `tera`
+  --> IcedForms\src\core\codegen.rs:32:48
+   |
+32 |         map.insert("widget_type".into(), tera::to_value("unknown".to_string()).unwrap());
+   |                                                ^^^^^^^^ not found in `tera`
+
+error[E0425]: cannot find function `to_value` in crate `tera`
+  --> IcedForms\src\core\codegen.rs:33:42
+   |
+33 |         map.insert("props".into(), tera::to_value(Map::new()).unwrap());
+   |                                          ^^^^^^^^ not found in `tera`
+
+error[E0425]: cannot find function `to_value` in crate `tera`
+  --> IcedForms\src\core\codegen.rs:42:41
+   |
+42 |     map.insert("children".into(), tera::to_value(children_values).unwrap());
+   |                                         ^^^^^^^^ not found in `tera`
+
+error[E0425]: cannot find function `to_value` in crate `tera`
+  --> IcedForms\src\core\codegen.rs:44:11
+   |
+44 |     tera::to_value(map).unwrap()
+   |           ^^^^^^^^ not found in `tera`
+
+error[E0425]: cannot find function `to_value` in crate `tera`
+  --> IcedForms\src\core\codegen.rs:58:68
+   |
+58 |                 prop_map.insert(key.name.to_string().into(), tera::to_value(val).unwrap());
+   |                                                                    ^^^^^^^^ not found in `tera`
+
+error[E0425]: cannot find function `to_value` in crate `tera`
+  --> IcedForms\src\core\codegen.rs:60:53
+   |
+60 |             out.insert(id.to_string().into(), tera::to_value(prop_map).unwrap());
+   |                                                     ^^^^^^^^ not found in `tera`
+
+error[E0425]: cannot find function `to_value` in crate `tera`
+  --> IcedForms\src\core\codegen.rs:62:53
+   |
+62 |             out.insert(id.to_string().into(), tera::to_value(Map::new()).unwrap());
+   |                                                     ^^^^^^^^ not found in `tera`
+
+error[E0425]: cannot find function `to_value` in crate `tera`
+  --> IcedForms\src\core\codegen.rs:73:11
+   |
+73 |     tera::to_value(root).unwrap()
+   |           ^^^^^^^^ not found in `tera`
+
+warning: unused import: `crate::blueprints::*`
+ --> IcedForms\src\blueprints\grid_bp.rs:9:5
+  |
+9 | use crate::blueprints::*;
+  |     ^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `space`
+ --> IcedForms\src\blueprints\rich_text_bp.rs:8:99
+  |
+8 | use iced::widget::{rich_text, mouse_area, container, column, row, button, scrollable, responsive, space};
+  |                                                                                                   ^^^^^
+
+warning: unused import: `crate::blueprints::*`
+  --> IcedForms\src\blueprints\rich_text_bp.rs:14:5
+   |
+14 | use crate::blueprints::*;
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `iced::widget::Text`
+   --> IcedForms\src\blueprints\rich_text_bp.rs:587:5
+    |
+587 | use iced::widget::Text;
+    |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `MenuAction`
+  --> IcedForms\src\blueprints\table_bp.rs:11:19
+   |
+11 | use crate::core::{MenuAction, Message};
+   |                   ^^^^^^^^^^
+
+warning: unused import: `render_style`
+ --> IcedForms\src\ui\inspector_panel_prop.rs:9:28
+  |
+9 | use crate::ui::{UiPalette, render_style, uitheme};
+  |                            ^^^^^^^^^^^^
+
+warning: unused imports: `button`, `column`, `container`, `mouse_area`, `row`, `rule`, and `space`
+ --> IcedForms\src\ui\dialogs.rs:5:20
+  |
+5 | use iced::widget::{column, container, text, mouse_area, row, space, button, rule};
+  |                    ^^^^^^  ^^^^^^^^^        ^^^^^^^^^^  ^^^  ^^^^^  ^^^^^^  ^^^^
+
+warning: unused imports: `Alignment`, `Color`, `Length`, and `Padding`
+ --> IcedForms\src\ui\dialogs.rs:6:12
+  |
+6 | use iced::{Color, Element, Length, Padding, Alignment, Theme};
+  |            ^^^^^           ^^^^^^  ^^^^^^^  ^^^^^^^^^
+
+warning: unused import: `iced::mouse::Interaction`
+ --> IcedForms\src\ui\dialogs.rs:7:5
+  |
+7 | use iced::mouse::Interaction;        
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `OverlayAction`
+ --> IcedForms\src\ui\dialogs.rs:9:28
+  |
+9 | use crate::core::{Message, OverlayAction};
+  |                            ^^^^^^^^^^^^^
+
+error[E0308]: mismatched types
+    --> IcedForms\src\core\codegen.rs:18:13
+     |
+  17 |         map.insert(
+     |             ------ arguments to this method are incorrect
+  18 |             "widget_type".to_string(),
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Key<'_>`, found `String`
+     |
+note: method defined here
+    --> C:\Users\Serg\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib/rustlib/src/rust\library\std\src\collections
+\hash\map.rs:1333:12
+     |
+1333 |     pub fn insert(&mut self, k: K, v: V) -> Option<V> {
+     |            ^^^^^^
+help: call `Into::into` on this expression to convert `std::string::String` into `tera::value::Key<'_>`
+     |
+  18 |             "widget_type".to_string().into(),
+     |                                      +++++++
+
+error[E0061]: this function takes 0 arguments but 1 argument was supplied
+  --> IcedForms\src\core\codegen.rs:81:22
+   |
+81 |     let tera = match Tera::new(&tera_glob) {
+   |                      ^^^^^^^^^ ---------- unexpected argument of type `&std::string::String`
+   |
+note: associated function defined here
+  --> C:\Users\Serg\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tera-2.1.1\src\tera.rs:91:12
+   |
+91 |     pub fn new() -> Self {
+   |            ^^^
+help: remove the extra argument
+   |
+81 -     let tera = match Tera::new(&tera_glob) {
+81 +     let tera = match Tera::new() {
+   |
+
+error[E0308]: mismatched types
+  --> IcedForms\src\core\codegen.rs:82:9
+   |
+81 |     let tera = match Tera::new(&tera_glob) {
+   |                      --------------------- this expression has type `Tera`
+82 |         Ok(t) => t,
+   |         ^^^^^ expected `Tera`, found `Result<_, _>`
+   |
+   = note: expected struct `Tera`
+                found enum `std::result::Result<_, _>`
+
+error[E0308]: mismatched types
+  --> IcedForms\src\core\codegen.rs:83:9
+   |
+81 |     let tera = match Tera::new(&tera_glob) {
+   |                      --------------------- this expression has type `Tera`
+82 |         Ok(t) => t,
+83 |         Err(e) => {
+   |         ^^^^^^ expected `Tera`, found `Result<_, _>`
+   |
+   = note: expected struct `Tera`
+                found enum `std::result::Result<_, _>`
+
+error[E0061]: this function takes 0 arguments but 1 argument was supplied
+   --> IcedForms\src\core\codegen.rs:131:22
+    |
+131 |     let tera = match Tera::new(&tera_glob) {
+    |                      ^^^^^^^^^ ---------- unexpected argument of type `&std::string::String`
+    |
+note: associated function defined here
+   --> C:\Users\Serg\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tera-2.1.1\src\tera.rs:91:12
+    |
+ 91 |     pub fn new() -> Self {
+    |            ^^^
+help: remove the extra argument
+    |
+131 -     let tera = match Tera::new(&tera_glob) {
+131 +     let tera = match Tera::new() {
+    |
+
+error[E0308]: mismatched types
+   --> IcedForms\src\core\codegen.rs:132:9
+    |
+131 |     let tera = match Tera::new(&tera_glob) {
+    |                      --------------------- this expression has type `Tera`
+132 |         Ok(t) => t,
+    |         ^^^^^ expected `Tera`, found `Result<_, _>`
+    |
+    = note: expected struct `Tera`
+                 found enum `std::result::Result<_, _>`
+
+error[E0308]: mismatched types
+   --> IcedForms\src\core\codegen.rs:133:9
+    |
+131 |     let tera = match Tera::new(&tera_glob) {
+    |                      --------------------- this expression has type `Tera`
+132 |         Ok(t) => t,
+133 |         Err(e) => {
+    |         ^^^^^^ expected `Tera`, found `Result<_, _>`
+    |
+    = note: expected struct `Tera`
+                 found enum `std::result::Result<_, _>`
+
+warning: unused import: `crate::core::WidgetBlueprint`
+ --> IcedForms\src\core\codegen.rs:5:5
+  |
+5 | use crate::core::WidgetBlueprint;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unreachable pattern
+   --> IcedForms\src\app.rs:343:13
+    |
+343 |             _ => {
+    |             ^ no value can reach this
+    |
+note: multiple earlier patterns match some of the same values
+   --> IcedForms\src\app.rs:343:13
+    |
+155 |               Message::MenuEvent(action) => {
+    |               -------------------------- matches some of the same values
+...
+160 |               Message::WidgetEvent(id, action) => {
+    |               -------------------------------- matches some of the same values
+...
+166 | /             Message::UpdateProperty {
+167 | |                 widget_id,
+168 | |                 property_key,
+169 | |                 value,
+170 | |             } => {
+    | |_____________- matches some of the same values
+...
+181 |               Message::GlobalEvent(event) => {
+    |               --------------------------- matches some of the same values
+...
+343 |               _ => {
+    |               ^ ...and 7 other patterns collectively make this unreachable
+    = note: `#[warn(unreachable_patterns)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> IcedForms\src\blueprints\grid_bp.rs:237:13
+    |
+237 |         let mut prop_names = Vec::new();
+    |             ----^^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `factory`
+   --> IcedForms\src\blueprints\grid_bp.rs:236:45
+    |
+236 |     fn get_exportable_property_names(&self, factory: &Factory) -> Vec<PropertyKey> {
+    |                                             ^^^^^^^ help: if this is intentional, prefix it with an underscore: `
+_factory`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `factory`
+   --> IcedForms\src\blueprints\markdown_bp.rs:387:43
+    |
+387 |     fn build_editor_content<'a>(&'a self, factory: &'a Factory) -> Element<'a, Message, Theme> {
+    |                                           ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_f
+actory`
+
+warning: unused variable: `current_text`
+   --> IcedForms\src\blueprints\markdown_bp.rs:678:25
+    |
+678 |                     let current_text = editor_mut_ref.text();
+    |                         ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_current_text`
+
+warning: unused variable: `action_raw`
+   --> IcedForms\src\blueprints\mouse_area_bp.rs:256:17
+    |
+256 |             let action_raw = &props.action; //factory.get_property(&widget_id, "action");
+    |                 ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_action_raw`
+
+warning: unreachable pattern
+   --> IcedForms\src\blueprints\radio_bp.rs:344:21
+    |
+339 |                     Active => {
+    |                     ------ matches any value
+...
+344 |                     _ => {}
+    |                     ^ no value can reach this
+
+warning: unused variable: `Active`
+   --> IcedForms\src\blueprints\radio_bp.rs:339:21
+    |
+339 |                     Active => {
+    |                     ^^^^^^ help: if this is intentional, prefix it with an underscore: `_Active`
+
+warning: unused variable: `factory`
+   --> IcedForms\src\blueprints\rich_text_bp.rs:382:45
+    |
+382 |     fn get_exportable_property_names(&self, factory: &Factory) -> Vec<PropertyKey> {
+    |                                             ^^^^^^^ help: if this is intentional, prefix it with an underscore: `
+_factory`
+
+warning: unused variable: `widget_id_cl`
+   --> IcedForms\src\blueprints\rich_text_bp.rs:461:25
+    |
+461 |                     let widget_id_cl = widget_id.clone();
+    |                         ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_widget_id_cl`
+
+warning: unused variable: `factory`
+   --> IcedForms\src\blueprints\rich_text_bp.rs:387:43
+    |
+387 |     fn build_editor_content<'a>(&'a self, factory: &'a Factory) -> Element<'a, Message, Theme> {
+    |                                           ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_f
+actory`
+
+warning: variable does not need to be mutable
+   --> IcedForms\src\blueprints\table_bp.rs:186:13
+    |
+186 |         let mut prop_names = Vec::new();
+    |             ----^^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: unused variable: `factory`
+   --> IcedForms\src\blueprints\table_bp.rs:185:45
+    |
+185 |     fn get_exportable_property_names(&self, factory: &Factory) -> Vec<PropertyKey> {
+    |                                             ^^^^^^^ help: if this is intentional, prefix it with an underscore: `
+_factory`
+
+warning: unused variable: `def`
+  --> IcedForms\src\blueprints\aw\combo_box_bp.rs:94:13
+   |
+94 |         let def = ComboBoxProps::default();
+   |             ^^^ help: if this is intentional, prefix it with an underscore: `_def`
+
+warning: unreachable pattern
+   --> IcedForms\src\core\factory.rs:859:13
+    |
+859 |             _ => {
+    |             ^ no value can reach this
+    |
+note: multiple earlier patterns match some of the same values
+   --> IcedForms\src\core\factory.rs:859:13
+    |
+782 |             TYPE_USIZE => {
+    |             ---------- matches some of the same values
+...
+788 |             TYPE_FLOAT => {
+    |             ---------- matches some of the same values
+...
+795 |             TYPE_BOOL => {
+    |             --------- matches some of the same values
+...
+801 |             TYPE_LENGTH => {
+    |             ----------- matches some of the same values
+...
+859 |             _ => {
+    |             ^ ...and 9 other patterns collectively make this unreachable
+
+warning: variable does not need to be mutable
+   --> IcedForms\src\ui\workspace.rs:110:9
+    |
+110 |     let mut body_row = stack![body_grid_row]
+    |         ----^^^^^^^^
+    |         |
+    |         help: remove this `mut`
+
+warning: unused variable: `blueprint_rc`
+  --> IcedForms\src\ui\hierarchy.rs:26:20
+   |
+26 |         .map(|(id, blueprint_rc)| {
+   |                    ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_blueprint_rc`
+
+Some errors have detailed explanations: E0061, E0308, E0425.
+For more information about an error, try `rustc --explain E0061`.
+warning: `IcedForms` (bin "IcedForms") generated 28 warnings
+error: could not compile `IcedForms` (bin "IcedForms") due to 19 previous errors; 28 warnings emitted

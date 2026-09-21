@@ -318,7 +318,7 @@ pub fn generate_widget_tree_code(_app: &App) -> String {
     context.insert("root_ids", &scope_root_ids);
     context.insert("last_widget_id", &last_widget_id);
     context.insert("iced_imports_block", &iced_imports_block);
-    context.insert("field_counter", &project.field_counter);
+    context.insert("widget_counter", &project.widget_counter);
     context.insert("project_title", "Iced Forms App");
     context.insert("crate_name", "IcedForms");
 
@@ -484,7 +484,7 @@ pub fn prepare_code_project(_app: &App) -> Result<CadProject, String> {
     let factory = _app.get_factory();
     let mut project = CadProject::new();
 
-    project.field_counter = factory.get_field_counter();
+    project.widget_counter = factory.get_widget_counter();
     //project.widgets_order = factory.get_blueprint_keys();
     project.widgets_order = factory.get_blueprints_id_build_order();
 

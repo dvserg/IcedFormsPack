@@ -1,0 +1,13 @@
+[package]
+name = "{{ project_title | default(value='generated_iced_app') | lower | replace(from=' ', to='_') }}"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+iced = { version = "0.14", features = ["advanced", "tokio", "image", "svg", "qr_code"] }
+log = "0.4"
+env_logger = "0.11"
+flexi_logger = "0.29"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+ordered-float = "4.2"

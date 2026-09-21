@@ -1,0 +1,10 @@
+{# Файл: templates/src/core.rs.tera #}
+{% for module in core_modules %}
+pub mod {{ module }};
+pub use {{ module }}::*;
+
+{% endfor %}
+
+#[path = "event_logic.rs"]
+pub mod event_logic;
+pub use event_logic::*;

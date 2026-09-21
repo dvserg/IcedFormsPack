@@ -139,7 +139,7 @@ pub fn generate_project_json_string(factory: &Factory) -> Result<String, std::io
 
     // Формируем единую структуру JSON
     let full_envelope = json!({
-        "field_counter": factory.field_counter,
+        "widget_counter": factory.widget_counter,
         "widgets_order": widgets_order,         // Fix: Order
         "blueprints": blueprints_json_map,     
         "field_values": vtable_json_value       // Переименовано обратно по спецификации
@@ -160,7 +160,7 @@ pub fn generate_project_json_string(factory: &Factory) -> Result<String, std::io
 // -----------------------------------------------------------------------------
 
 /// Функция принимает JSON-текст проекта, восстанавливает VTable,
-/// возвращает счетчик field_counter и реактивно формирует Rc-чертежи в таблице.
+/// возвращает счетчик widget_counter и реактивно формирует Rc-чертежи в таблице.
 pub fn deserialize_from_json_string(
     factory: &mut Factory,
     json_text: &str,
@@ -176,8 +176,8 @@ pub fn deserialize_from_json_string(
     })?;
 
     // Восстанавливаем генератор уникальности ID виджетов
-    let loaded_counter = envelope["field_counter"].as_u64().unwrap_or(0) as usize;
-    factory.field_counter = loaded_counter;
+    let loaded_counter = envelope["widget_counter"].as_u64().unwrap_or(0) as usize;
+    factory.widget_counter = loaded_counter;
 
     let widgets_order = &envelope["widgets_order"];
     let blueprints_data = &envelope["blueprints"];
@@ -554,7 +554,7 @@ pub fn generate_export_json_string(factory: &Factory) -> Result<String, std::io:
     // УПАКОВКА В СИСТЕМНЫЙ КОНВЕРТ CAD SCHEMA
     // =====================================================================
     let full_envelope = json!({
-        "field_counter":  factory.field_counter,
+        "widget_counter": factory.widget_counter,
         "widgets_order":  widgets_order,
 
         "types_registry": types_registry,

@@ -1,0 +1,29 @@
+{# Файл: templates/widgets/container.tera #}
+
+{# Файл: templates/widgets/container.tera #}
+
+{# Ищем единственного ребенка, у которого parent == ID этого контейнера #}
+{%- set child_id = "" -%}
+{%- for potential_child_id in widgets_order -%}
+    {%- set child_widget = widgets[potential_child_id] -%}
+    {%- if child_widget.properties and child_widget.properties.parent == id -%}
+        {%- set_global child_id = potential_child_id -%}
+    {%- endif -%}
+{%- endfor -%}
+
+container(
+    {%- if child_id != "" -%}
+        {{ child_id }}
+    {%- else -%}
+        {# Если контейнер пуст, подставляем safe-распорку #}
+        space::Space::new().width(0.0).height(0.0)
+    {%- endif -%}
+)
+    {{- < width      props={widget.properties} /> -}}
+    {{- < height     props={widget.properties} /> -}}
+    {{- < max_width  props={widget.properties} /> -}}
+    {{- < max_height props={widget.properties} /> -}}
+    {{- < padding    props={widget.properties} /> -}}
+    {{- < align_x    props={widget.properties} /> -}}
+    {{- < align_y    props={widget.properties} /> -}}
+    {{- < container_style props={widget.properties} /> -}}

@@ -1,0 +1,12 @@
+{# Файл: templates/widgets/button.tera #}
+{# --- BUTTON --- #}
+
+{# Генерируем код текста Iced #}
+iced::widget::button("{{ widget.properties.text | default(value=widget.properties.label | default(value='Кнопка')) }}")
+    {{- < width  props={widget.properties} /> -}}
+    {{- < height props={widget.properties} /> -}}
+    {{- < padding  props={widget.properties} /> -}}
+    {{- < button_style props={widget.properties} /> -}}
+    {{- < on_press     widget={widget} /> -}}
+
+

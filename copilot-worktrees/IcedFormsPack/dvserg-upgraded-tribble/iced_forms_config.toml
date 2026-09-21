@@ -1,0 +1,8 @@
+template_path = "./templates"
+template_include = [
+    "widget_preview",
+    "components",
+    "widgets",
+]
+template_config = "./widget_config.toml"
+theme_style = "Blender"

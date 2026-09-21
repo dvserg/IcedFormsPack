@@ -1,0 +1,83 @@
+{# Файл: templates/widgets/image.tera #}
+{# --- Image --- #}
+
+{# Извлекаем файловый путь к картинке #}
+{%- set img_path = widget.properties | get(key="path_code", default='"assets/placeholder.png"') -%}
+
+{# Инициализируем изображение через каноничный Handle загрузки с диска в Iced 0.14 #}
+image(
+    iced::widget::image::Handle::from_path({{ img_path }})
+)
+    {{- < width       props={widget.properties} /> -}}
+    {{- < height      props={widget.properties} /> -}}
+    {{- < content_fit props={widget.properties} /> -}}
+    {{- < scale       props={widget.properties} /> -}}
+    {{- < opacity     props={widget.properties} /> -}}
+    {{- < rotation    props={widget.properties} /> -}}
+    {{- < border_radius props={widget.properties} /> -}}
+    {{- < filter_method props={widget.properties} /> -}}
+
+
+{# --- content_fit --- #}
+{% component content_fit(props) %}
+    {# content_fit #}
+    {%- if props.content_fit is defined and props.content_fit -%}
+        {% set content_fit_code = props.content_fit | lower | trim %}
+        {%- if content_fit_code == "fill" -%}
+        .content_fit(ContentFit::Fill)
+        {%- elif content_fit_code == "cover" -%}
+        .content_fit(ContentFit::Cover)
+        {%- elif content_fit_code == "contain" -%}
+        .content_fit(ContentFit::Contain)
+        {%- elif content_fit_code == "none" -%}
+        .content_fit(ContentFit::None)
+        {%- endif -%}        
+    {%- endif -%}
+{% endcomponent %}
+
+
+{# --- scale --- #}
+{% component scale(props) %}
+    {# scale #}
+    {%- if props.scale is defined and props.scale -%}
+    .scale({{props.scale_code}})
+    {%- endif -%}
+{% endcomponent %}
+
+
+{# --- rotation --- #}
+{% component rotation(props) %}
+    {# rotation #}
+    {%- if props.rotation is defined and props.rotation -%}
+    .rotation(Rotation::Floating(Degrees({{props.rotation_code}}).into()))
+    {%- endif -%}
+{% endcomponent %}
+
+
+{# --- opacity --- #}
+{% component opacity(props) %}
+    {# opacity #}
+    {%- if props.opacity is defined and props.opacity -%}
+        {%- if props.opacity >= 0 and props.opacity < 1 -%}
+        .opacity({{props.opacity_code}})
+        {%- endif -%}
+    {%- endif -%}
+{% endcomponent %}
+
+
+{# --- border_radius --- #}
+{% component border_radius(props) %}
+    {# border_radius #}
+    {%- if props.border_radius is defined and props.border_radius -%}
+    .border_radius({{props.border_radius_code}})
+    {%- endif -%}
+{% endcomponent %}
+
+
+{# --- filter_method --- #}
+{% component filter_method(props) %}
+    {# filter_method #}
+    {%- if props.filter_method is defined and props.filter_method == true -%}
+    .filter_method(FilterMethod::Nearest)
+    {%- endif -%}
+{% endcomponent %}

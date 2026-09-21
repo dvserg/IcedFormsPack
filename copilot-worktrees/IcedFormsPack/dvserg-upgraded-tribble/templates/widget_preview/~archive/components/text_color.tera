@@ -1,0 +1,13 @@
+{# Файл: templates/components/text_color.tera #}
+{# ПРАВИЛО: Сначала проверяем модифицированные предпарсингом данные 'xxx_code', потом оригинальные 'xxx' #}
+
+
+{# Цвета #}
+{# --- text_color --- #}
+{% component text_color(props) %}
+    {%- if props.text_color_code is defined and props.text_color_code -%}
+        .color({{ props.text_color_code }})
+    {%- elif props.text_color is defined and props.text_color -%}
+        .color({{ props.text_color }})
+    {%- endif -%}
+{% endcomponent text_color %}

@@ -1,0 +1,24 @@
+{# Файл: templates/components/aligment.tera #}
+{# ПРАВИЛО: Сначала проверяем модифицированные предпарсингом данные 'xxx_code', потом оригинальные 'xxx' #}
+
+{# Выравнивание #}
+
+{# --- align_x --- #}
+{% component align_x(props) %}
+    {# align_x #}
+    {% if props.align_x_code is defined and props.align_x_code %}
+        .align_x({{ props.align_x_code }})
+    {% elif props.align_x is defined and props.align_x %}
+        .align_x({{ props.align_x }})
+    {% endif %}
+{% endcomponent %}
+
+{# --- align_y --- #}
+{% component align_y(props) %}
+    {# align_y #}
+    {% if props.align_y_code is defined and props.align_y_code %}
+        .align_y({{ props.align_y_code }})
+    {% elif props.align_y is defined and props.align_y %}
+        .align_y({{ props.align_y }})
+    {% endif %}
+{% endcomponent %}

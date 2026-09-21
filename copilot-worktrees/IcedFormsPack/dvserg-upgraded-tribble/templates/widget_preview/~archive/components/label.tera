@@ -1,0 +1,12 @@
+{# Файл: templates/components/label.tera #}
+
+{# Label #}
+
+{# --- label --- #}
+{% component label(props) %}
+    {%- if props.label_code is defined and props.label_code -%}
+        .label({{ props.label_code }})
+    {%- elif props.label is defined and props.label -%}
+        .label({{ props.label }})
+    {%- endif -%}
+{% endcomponent %}

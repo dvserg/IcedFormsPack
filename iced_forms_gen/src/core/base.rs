@@ -14,7 +14,7 @@ pub mod cli {
         name = "iced_compiler",
         author = "CAD Forms Workbench Team",
         version = "1.0",
-        about = "***: транслирует CAD JSON-макеты в готовый код Iced 0.14"
+        about = "iced_forms_gen: транслирует CAD JSON-макеты в готовый код Iced 0.14"
     )]
     pub struct CliOptions {
         /// Путь к входному JSON-файлу макета верстки (Обязательный параметр)

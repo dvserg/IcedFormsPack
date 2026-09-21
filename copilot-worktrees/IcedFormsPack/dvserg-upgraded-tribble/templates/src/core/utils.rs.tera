@@ -1,0 +1,75 @@
+{# Файл: templates/src/core/utils.rs.tera #}
+use iced::{Padding, Pixels, Font};
+use iced::font::{Family, Style, Weight, Stretch};
+
+// -----------------------------------------------------------------------------
+// Создание Color из строки HEX
+pub fn color4hex_def(hex: &str, def: iced::Color) -> iced::Color {
+    let clean_hex = hex.trim();
+
+    if clean_hex == "transparent" {
+        return iced::Color::TRANSPARENT;
+    }
+
+    let hex_digits = clean_hex.trim_start_matches('#');
+    
+    if hex_digits.len() != 6 { 
+        return def; 
+    }
+    
+    let r = match u8::from_str_radix(&hex_digits[0..2], 16) {
+        Ok(v) => v as f32 / 255.0,
+        Err(_) => return def,
+    };
+    let g = match u8::from_str_radix(&hex_digits[2..4], 16) {
+        Ok(v) => v as f32 / 255.0,
+        Err(_) => return def,
+    };
+    let b = match u8::from_str_radix(&hex_digits[4..6], 16) {
+        Ok(v) => v as f32 / 255.0,
+        Err(_) => return def,
+    };
+    
+    iced::Color { r, g, b, a: 1.0 }
+}
+
+// -----------------------------------------------------------------------------
+// Создание padding из vec![f22; 4]
+pub fn padding4vec(values: [f32; 4]) -> Padding {
+    Padding {
+        top: values[0],
+        right: values[1],
+        bottom: values[2],
+        left: values[3],
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Создание iced::Font
+pub fn create_iced_font(font_family: &str, is_bold: bool, is_italic: bool) -> Font {
+
+    // Сопоставляем с встроенными шрифтами Iced (без аллокаций)
+    let family = match font_family.trim() {
+        "Monospace" | "monospace"  => Family::Monospace,
+        "SansSerif" | "sans-serif" => Family::SansSerif,
+        "Serif"     | "serif"      => Family::Serif,
+        "Cursive"   | "cursive"    => Family::Cursive,
+        "Fantasy"   | "fantasy"    => Family::Fantasy,
+
+        // Если имя кастомное (например, "Arial"), превращаем его в вечную строку 'static
+        custom_name if !custom_name.is_empty() => {
+            Family::Name(Box::leak(custom_name.to_string().into_boxed_str()))
+        }
+
+        // Защитный дефолт, если строка пришла пустой
+        _ => Family::SansSerif,
+    };
+
+    // Конструируем и возвращаем готовый Font
+    Font {
+        family,
+        weight:  if is_bold   { Weight::Bold  } else { Weight::Normal },
+        style:   if is_italic { Style::Italic } else { Style::Normal  },
+        stretch: Stretch::Normal, // Обязательный дефолт для структуры Font
+    }
+}

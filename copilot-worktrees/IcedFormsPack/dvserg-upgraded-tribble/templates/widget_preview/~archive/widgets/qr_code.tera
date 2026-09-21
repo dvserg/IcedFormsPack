@@ -1,0 +1,60 @@
+{# Файл: templates/widgets/qr_code.tera #}
+{# --- QR_CODE --- #}
+
+{# Конструктор qr_code в Iced 0.14 принимает ссылку на Data #} 
+qr_code(&app.state.{{ id }}_data)
+    {{- < cell_size       props={widget.properties} /> -}}
+    {{- < qr_code_style   props={widget.properties} /> -}}
+
+
+{# --- state_qr_code_declare --- #}
+{% component state_qr_code_declare(widgets_order, widgets) %}
+    {# Объявление State qr_code: Выбранное значение #}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "qr_code" %}
+            pub {{ id }}_data: iced::widget::qr_code::Data,
+        {%- endif -%}
+    {%- endfor -%}
+{% endcomponent %}
+
+{# --- state_qr_code_init --- #}
+{% component state_qr_code_init(widgets_order, widgets) %}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "qr_code" %}
+            {# Инициализация State qr_code: Выбранное значение #}
+            {%- set cur_data = widget.properties | get(key="data_code", default=0.0) -%}
+
+            {{ id }}_data: iced::widget::qr_code::Data::new({{cur_data}}).unwrap(),
+        {%- endif -%}
+    {%- endfor -%}
+{% endcomponent %}
+
+{# --- cell_size --- #}
+{% component cell_size(props) %}
+    {# cell_size #}
+    {%- if props.cell_size is defined and props.cell_size -%}
+        .cell_size({{ props.cell_size_code }})
+    {%- endif -%}
+{% endcomponent %}
+
+{# --- qr_code_style --- #}
+{% component qr_code_style(props) %}
+    {# qr_code_style #}
+    {%- if props.bg_color is defined or props.cell_color is defined -%}
+    .style(move |_theme| {
+        let mut base_style = qr_code::default(_theme);
+
+        {%- if props.cell_color and props.cell_color != "Color::TRANSPARENT" -%}
+            base_style.cell = {{props.cell_color_code}};
+        {%- endif -%}
+
+        {%- if props.bg_color and props.bg_color != "Color::TRANSPARENT" -%}
+            base_style.background = {{props.bg_color_code}};
+        {%- endif -%}
+
+        base_style
+    })
+    {%- endif -%}
+{% endcomponent %}

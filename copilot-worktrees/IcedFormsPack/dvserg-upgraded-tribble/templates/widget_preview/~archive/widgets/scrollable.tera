@@ -1,0 +1,79 @@
+{# Файл: templates/widgets/scrollable.tera #}
+{# --- SCROLLABLE --- #}
+
+{# Ищем единственного ребенка, у которого parent == ID этого скроллера #}
+{%- set child_id = "" -%}
+{%- for potential_child_id in widgets_order -%}
+    {%- set child_widget = widgets[potential_child_id] -%}
+    {%- if child_widget.properties and child_widget.properties.parent == id -%}
+        {%- set_global child_id = potential_child_id -%}
+    {%- endif -%}
+{%- endfor -%}
+
+scrollable(
+    {%- if child_id != "" -%}
+        {{ child_id }}
+    {%- else -%}
+        {# Если скроллер пуст, подставляем safe-распорку #}
+        space::Space::new().width(0.0).height(0.0)
+    {%- endif -%}
+)
+    {{- < width      props={widget.properties} /> -}}
+    {{- < height     props={widget.properties} /> -}}
+    {{- < direction  props={widget.properties} /> -}}
+    {{- < scrollable_style props={widget.properties} /> -}}
+
+
+{# --- direction --- #}
+{% component direction(props) %}
+    {%- if props.direction is defined -%}
+        {%set direction = props.direction | trim | lower %}
+        {%- if direction == "horizontal" -%}
+            .direction(scrollable::Direction::Horizontal(
+                {{- < scrollbar props={props} /> -}}
+            ))
+        {%- elif direction == "both" -%}
+            .direction(scrollable::Direction::Both {
+                vertical:   
+                    {{- < scrollbar props={props} /> -}}, 
+                horizontal: 
+                    {{- < scrollbar props={props} /> -}}
+            })
+        {%- endif -%}    
+    {%- endif -%}    
+{% endcomponent %}
+
+{# --- scrollbar --- #}
+{% component scrollbar(props) %}
+    scrollable::Scrollbar::default()
+    {%- if props.scrollbar_width is defined and props.scrollbar_width -%}
+        .width({{props.scrollbar_width_code}})
+    {%- endif -%}
+    {%- if props.scrollbar_margin is defined and props.scrollbar_margin -%}
+        .margin({{props.scrollbar_margin_code}})
+    {%- endif -%}
+    {%- if props.scroller_width is defined and props.scroller_width -%}
+        .scroller_width({{props.scroller_width_code}})
+    {%- endif -%} 
+{% endcomponent %}
+
+{# --- scrollable_style --- #}
+{% component scrollable_style(props) %}
+    {%- if props.track_color is defined or props.thumb_color is defined -%}
+        .style(move |_theme: &Theme, _status: scrollable::Status| {
+            let mut base_style = scrollable::default(_theme, _status);
+
+            {%- if props.track_color and props.track_color != "Color::TRANSPARENT" -%}
+                base_style.vertical_rail.background   = Some(iced::Background::Color({{props.track_color_code}}));
+                base_style.horizontal_rail.background = Some(iced::Background::Color({{props.track_color_code}}));
+            {%- endif -%} 
+
+            {%- if props.thumb_color and props.thumb_color != "Color::TRANSPARENT" -%}
+                base_style.vertical_rail.scroller.background   = iced::Background::Color({{props.thumb_color_code}});
+                base_style.horizontal_rail.scroller.background = iced::Background::Color({{props.thumb_color_code}});
+            {%- endif -%} 
+
+            base_style
+        })
+    {%- endif -%}
+{% endcomponent %}

@@ -1,0 +1,115 @@
+{# Файл: templates/widgets/pick_list.tera #}
+{# --- PICK_LIST --- #}
+
+{# Извлекаем из ОЗУ готовую геометрию #}
+{%- set padding_code = widget.properties | get(key="padding_code", default="") -%}
+
+{# Извлекаем реактивное событие изменения выбора #}
+{%- set action_name = widget.properties | get(key="action", default="NoOp") | trim -%}
+
+{# Статический массив вариантов для генерации на стеке (извлекаем массив из свойств виджета) #}
+{%- if widget.properties.options is defined -%}
+    {%- set options_list = widget.properties.options | split(pat=",") -%}
+{%- endif -%}
+
+pick_list(
+    {# Формируем статический массив строк Rust прямо на стеке функции #}
+    [  
+        {% if options_list is defined %}
+            {% for option in options_list %}
+            "{{ option | trim }}".to_string(),
+            {% endfor %}
+        {% endif %}
+    ],
+    Some( app.state.{{id}}_selected.clone() ),
+    {# Если пользователь выбирает элемент, отправляем экшен, иначе NoOp-заглушку с игнорированием аргумента #}
+    {%- if action_name != "" and action_name != "None" -%}
+    move |selected_item| { 
+        Message::WidgetEvent(
+            WidgetAction::OnInputChange(
+                "{{ id }}".to_string(),
+                "{{ action_name }}".to_string(),
+                selected_item,
+            )
+        )
+    }
+    {%- else -%}
+        |_| crate::core::Message::NoOp
+    {%- endif -%}
+)
+    {{- < width     props={widget.properties} /> -}}
+    {{- < padding   props={widget.properties} /> -}}
+    {{- < font      props={widget.properties} /> -}}
+    {{- < text_size_full   props={widget.properties} /> -}}
+    {{- < text_line_height props={widget.properties} /> -}}
+    {{- < menu_height props={widget.properties} /> -}}
+    {{- < placeholder props={widget.properties} /> -}}
+    {{- < handle      props={widget.properties} /> -}}
+
+
+{# --- state_pick_list_declare --- #}
+{% component state_pick_list_declare(widgets_order, widgets) %}
+    {# Объявление State pick_list: Выбранное значение #}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "pick_list" %}
+            pub {{ id }}_selected: String,
+        {%- endif -%}
+    {%- endfor -%}
+{% endcomponent %}
+
+{# --- state_pick_list_init --- #}
+{% component state_pick_list_init(widgets_order, widgets) %}
+    {# Инициализация State pick_list: Выбранное значение #}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "pick_list" %}
+
+            {# Извлекаем выбранное значение #}
+            {%- set selected_value = widget.properties | get(key="value_code", default="") | trim -%}
+
+            {%- if selected_value != "" %}
+                {{ id }}_selected: String::from({{selected_value}}),
+            {%- else -%}
+                {{ id }}_selected: String::new(),
+            {%- endif -%}
+        {%- endif -%}
+    {%- endfor -%}
+{% endcomponent %}
+
+{# --- state_pick_list_update --- #}
+{% component state_pick_list_update(widgets_order, widgets) %}
+   {% for id in widgets_order %}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "pick_list" %}
+            if id == String::from("{{id}}") {
+                app.state.{{ id }}_selected = value.clone();
+            }
+        {%- endif -%}
+    {% endfor %}
+{% endcomponent %}
+
+{# --- handle --- #}
+{% component handle(props) %}
+    {%- if props.handle is defined and props.handle == false -%}
+        .handle({{ props.handle_code }})
+    {%- endif -%}
+{% endcomponent %}
+
+
+{# --- placeholder --- #}
+{% component placeholder(props) %}
+    {%- if props.placeholder is defined and props.placeholder -%}
+        .placeholder("{{ props.placeholder_code }}")
+    {%- endif -%}
+{% endcomponent %}
+
+
+{# --- menu_height --- #}
+{% component menu_height(props) %}
+    {%- if props.menu_height is defined and props.menu_height -%}
+        .menu_height({{ props.menu_height_code }})
+    {%- endif -%}
+{% endcomponent %}    
+
+

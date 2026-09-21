@@ -1,0 +1,134 @@
+{# Файл: templates/widgets/radio.tera #}
+{# --- RADIO --- #}
+
+{# Извлекаем строковые параметры состояния радио-кнопки #}
+{%- set radio_label   = widget.properties | get(key="label_code", default="Radio") -%}
+{%- set current_value = widget.properties | get(key="value_code", default="") -%}
+{%- set selected_var  = widget.properties | get(key="selected_code", default="app.selected_option") -%}
+{%- set group         = widget.properties | get(key="group", default="") -%}
+{%- set state_var     = group if group != "" else "None" -%}
+
+radio(
+    {{ radio_label }},
+    {{ current_value }},
+    {%- if group == "" -%}
+        Some(None),
+    {%- else -%}
+        Some(&app.state.{{group}}_radio_selected),
+    {%- endif -%}
+    {# Если пользователь кликает по радио-кнопке отправляем экшен, иначе NoOp-заглушку с игнорированием аргумента #}
+    {%- if action_name is defined and action_name != "None" -%}
+        crate::core::Message::{{ action_name }}
+    {%- else -%}
+        |_| crate::core::Message::NoOp
+    {%- endif -%}
+)
+    {{- < flag_size_radio  props={widget.properties} /> -}}
+    {{- < width            props={widget.properties} /> -}}
+    {{- < spacing          props={widget.properties} /> -}}
+    {{- < text_size_full   props={widget.properties} /> -}}
+    {{- < text_line_height props={widget.properties} /> -}}
+    {{- < font             props={widget.properties} /> -}}
+    {{- < text_wrapping    props={widget.properties} /> -}}
+    {{- < text_shaping     props={widget.properties} /> -}}
+    {{- < radio_style      props={widget.properties} id={id} /> -}}
+
+
+{# --- state_radio_declare --- #}
+{% component state_radio_declare(widgets_order, widgets) %}
+    {#- Инициализируем список групп -#}
+    {%- set_global groups_list = [] -%}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "radio" %}
+            {%- set group_name = widget.properties | get(key="group", default="") | trim -%}
+            {%- if group_name != "" and group_name not in groups_list -%}
+                {#- Сохраняем имя группы в глобальный массив, чтобы заблокировать повторы -#}
+                {%- set_global groups_list = [...groups_list, group_name] -%}
+                {#- Генерируем групповое поле в структуру Rust -#}
+                pub {{ group_name }}_radio_selected: String,
+            {%- endif -%}
+        {%- endif -%}
+    {%- endfor -%}
+{% endcomponent %}
+
+{# --- state_radio_init --- #}
+{% component state_radio_init(widgets_order, widgets) %}
+    {#- Инициализируем список групп -#}
+    {%- set_global groups_list = [] -%}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "radio" %}
+            {%- set group_name = widget.properties | get(key="group", default="") | trim -%}
+            {%- if group_name != "" and group_name not in groups_list -%}
+                {#- Сохраняем имя группы в глобальный массив, чтобы заблокировать повторы -#}
+                {%- set_global groups_list = [...groups_list, group_name] -%}
+                {#- Генерируем групповое поле в структуру Rust -#}
+                {{ group_name }}_radio_selected: String::new(),
+            {%- endif -%}
+        {%- endif -%}
+    {%- endfor -%}
+{% endcomponent %}
+
+{# --- flag_size_radio --- #}
+{% component flag_size_radio(props) %}
+    {%- if props.flag_size_code is defined and props.flag_size_code -%}
+        .size({{ props.flag_size_code }})
+    {%- elif props.flag_size is defined and props.flag_size -%}
+        .size({{ props.flag_size }})
+    {%- endif -%}
+{% endcomponent %}
+
+{# --- radio_style --- #}
+{% component radio_style(props, id) %}
+    {% if props.text_color is defined or props.bg_color is defined 
+            or props.active_color is defined
+            or props.border_color is defined 
+            or props.border_width is defined %}
+
+        .style(move |_theme: &Theme, _status: radio::Status| {    
+            let mut base_style = radio::default(_theme, _status);
+
+            {#- Цвет текста -#}
+            {%- if props.text_color_code is defined and props.text_color_code -%}
+            base_style.text_color = Some({{props.text_color_code}});
+            {%- endif -%}
+
+            {#- Цвет бордюра -#}
+            {%- if props.border_color_code is defined and props.border_color_code -%}
+            base_style.border_color = {{props.border_color_code}};
+            {%- endif -%}
+
+            {#-  Ширина бордюра -#}
+            {%- if props.border_width_code is defined and props.border_width_code -%}
+            base_style.border_width = {{props.border_width_code}};
+            {%- endif -%}
+
+            {% if props.bg_color is defined or props.active_color is defined %}
+            match _status {
+                radio::Status::Active { .. } => {
+                    {% if props.bg_color and props.bg_color_code != "Color::TRANSPARENT" %}
+                    base_style.background = iced::Background::Color({{props.bg_color_code}});                    
+                    {% endif %}
+
+                    {% if props.active_color and props.active_color_code != "Color::TRANSPARENT" %}
+                    base_style.dot_color = {{props.active_color_code}};
+                    {% endif %}
+                }
+                radio::Status::Hovered { .. } => {
+                    {% if props.bg_color and props.bg_color_code != "Color::TRANSPARENT" %}
+                    base_style.background = iced::Background::Color({{props.bg_color_code}});                    
+                    {% endif %}
+
+                    {% if props.active_color and props.active_color_code != "Color::TRANSPARENT" %}
+                    base_style.dot_color = {{props.active_color_code}};
+                    {% endif %}
+                }
+                _ => {}
+            }
+            {% endif %}
+
+            base_style
+        })
+    {%- endif -%}
+{% endcomponent %}

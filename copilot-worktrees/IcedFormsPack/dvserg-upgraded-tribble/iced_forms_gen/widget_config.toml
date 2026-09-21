@@ -1,0 +1,43 @@
+# =========================================================================
+# 🎛️ CONFIG: Спецификация маппинга и синонимов для WYSIWYG-кодогенератора
+# =========================================================================
+
+[aliases]
+# Синонимы из JSON-макетов -> Каноничное имя типа виджета
+"text_label" = "text"
+"button_box" = "button_box"
+"input"      = "text_input"
+"qr"         = "qr_code"
+"scroll"     = "scrollable"
+"picklist"   = "pick_list"
+"dropdown"   = "pick_list"
+"toggle"     = "toggler"
+"check_box"  = "checkbox"
+"check"      = "checkbox"
+"chk"        = "checkbox"
+
+[templates]
+# Каноничное имя типа виджета -> Относительный путь к файлу Tera на диске
+"button"       = "widgets/button.tera"
+"button_box"   = "widgets/button_box.tera"
+"checkbox"     = "widgets/checkbox.tera"
+"column"       = "widgets/column.tera"
+"container"    = "widgets/container.tera"
+"counter"      = "widgets/counter.tera"
+"h_rule"       = "widgets/h_rule.tera"
+"image"        = "widgets/image.tera"
+"mouse_area"   = "widgets/mouse_area.tera"
+"pick_list"    = "widgets/pick_list.tera"
+"progress_bar" = "widgets/progress_bar.tera"
+"qr_code"      = "widgets/qr_code.tera"
+"radio"        = "widgets/radio.tera"
+"row"          = "widgets/row.tera"
+"scrollable"   = "widgets/scrollable.tera"
+"slider"       = "widgets/slider.tera"
+"space"        = "widgets/space.tera"
+"stack"        = "widgets/stack.tera"
+"svg"          = "widgets/svg.tera"
+"text_input"   = "widgets/text_input.tera"
+"text"         = "widgets/text.tera"
+"toggler"      = "widgets/toggler.tera"
+"v_rule"       = "widgets/v_rule.tera"

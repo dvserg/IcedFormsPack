@@ -1,0 +1,32 @@
+{# Файл: templates/src/messages.rs.tera #}
+use ordered_float::OrderedFloat;
+
+
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum Message {
+    // Пустая операция-заглушка
+    NoOp,
+
+    // События элементов (onPress, onToggle, ..)
+    WidgetEvent(WidgetAction),
+
+    // Обработка асинхронных потоков событий
+    GlobalEvent(iced::Event),
+}
+
+impl Eq for Message {}
+
+// События элементов
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum WidgetAction {
+    // Пустая операция-заглушка
+    NoOp,
+
+    OnPress(String, String),
+    OnToggle(String, String, bool),
+    OnSliderChange(String, String, OrderedFloat<f32>),
+    OnInputChange(String, String, String),
+    OnMouseEnter(String, String),
+    OnMouseExit(String, String),    
+}

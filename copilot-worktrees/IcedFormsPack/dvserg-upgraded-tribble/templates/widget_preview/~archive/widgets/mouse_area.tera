@@ -1,0 +1,94 @@
+{# Файл: templates/widgets/mouse_area.tera #}
+{# --- MOUSE_AREA --- #}
+
+{# Извлекаем управляющие экшены из VTable-кучи параметров виджета #}
+{%- set action_press   = widget.properties | get(key="action_press", default="") | trim -%}
+{%- set action_release = widget.properties | get(key="action_release", default="") | trim -%}
+{%- set action_enter   = widget.properties | get(key="action_enter", default="") | trim -%}
+{%- set action_exit    = widget.properties | get(key="action_exit", default="") | trim -%}
+
+{# Ищем единственного ребенка, у которого parent == ID этой мышиной области #}
+{%- set child_id = "" -%}
+{%- for potential_child_id in widgets_order -%}
+    {%- set child_widget = widgets[potential_child_id] -%}
+    {%- if child_widget.properties and child_widget.properties.parent == id -%}
+        {%- set_global child_id = potential_child_id -%}
+    {%- endif -%}
+{%- endfor -%}
+
+mouse_area(
+    {%- if child_id != "" -%}
+        {{ child_id }}
+    {%- else -%}
+        {# Если область пуста, подставляем safe-распорку #}
+        space::Space::new().width(0.0).height(0.0)
+    {%- endif -%}
+)
+    {{- < width       props={widget.properties} /> -}}
+    {{- < height      props={widget.properties} /> -}}
+    {{- < interaction props={widget.properties} /> -}}
+    {{- < on_press     widget={widget} /> -}}    
+
+
+{# --- mouse_cursor interaction --- #}
+{% component interaction(props) %}
+    {# interaction #}
+    {%- if props.cursor_type is defined and props.cursor_type -%}
+        {% set cursor_type_code = props.cursor_type | lower | trim %}
+        {%- if cursor_type_code == "none" -%}
+        .interaction(iced::mouse::Interaction::None)
+        {%- elif cursor_type_code == "hidden" -%}
+        .interaction(iced::mouse::Interaction::Hidden)
+        {%- elif cursor_type_code == "idle" -%}
+        .interaction(iced::mouse::Interaction::Idle)
+        {%- elif cursor_type_code == "contextmenu" -%}
+        .interaction(iced::mouse::Interaction::ContextMenu)
+        {%- elif cursor_type_code == "help" -%}
+        .interaction(iced::mouse::Interaction::Help)
+        {%- elif cursor_type_code == "pointer" -%}
+        .interaction(iced::mouse::Interaction::Pointer)
+        {%- elif cursor_type_code == "progress" -%}
+        .interaction(iced::mouse::Interaction::Progress)
+        {%- elif cursor_type_code == "wait" -%}
+        .interaction(iced::mouse::Interaction::Wait)
+        {%- elif cursor_type_code == "cell" -%}
+        .interaction(iced::mouse::Interaction::Cell)
+        {%- elif cursor_type_code == "crosshair" -%}
+        .interaction(iced::mouse::Interaction::Crosshair)
+        {%- elif cursor_type_code == "text" -%}
+        .interaction(iced::mouse::Interaction::Text)
+        {%- elif cursor_type_code == "alias" -%}
+        .interaction(iced::mouse::Interaction::Alias)
+        {%- elif cursor_type_code == "copy" -%}
+        .interaction(iced::mouse::Interaction::Copy)
+        {%- elif cursor_type_code == "move" -%}
+        .interaction(iced::mouse::Interaction::Move)
+        {%- elif cursor_type_code == "nodrop" -%}
+        .interaction(iced::mouse::Interaction::NoDrop)
+        {%- elif cursor_type_code == "notalowwed" -%}
+        .interaction(iced::mouse::Interaction::NotAllowed)
+        {%- elif cursor_type_code == "grab" -%}
+        .interaction(iced::mouse::Interaction::Grab)
+        {%- elif cursor_type_code == "grabbing" -%}
+        .interaction(iced::mouse::Interaction::Grabbing)
+        {%- elif cursor_type_code == "resizinghorizontally" -%}
+        .interaction(iced::mouse::Interaction::ResizingHorizontally)
+        {%- elif cursor_type_code == "resizingvertically" -%}
+        .interaction(iced::mouse::Interaction::ResizingVertically)
+        {%- elif cursor_type_code == "resizingdiagonallyup" -%}
+        .interaction(iced::mouse::Interaction::ResizingDiagonallyUp)
+        {%- elif cursor_type_code == "resizingdiagonallydown" -%}
+        .interaction(iced::mouse::Interaction::ResizingDiagonallyDown)
+        {%- elif cursor_type_code == "resizingcolumn" -%}
+        .interaction(iced::mouse::Interaction::ResizingColumn)
+        {%- elif cursor_type_code == "resizingrow" -%}
+        .interaction(iced::mouse::Interaction::ResizingRow)
+        {%- elif cursor_type_code == "allscroll" -%}
+        .interaction(iced::mouse::Interaction::AllScroll)
+        {%- elif cursor_type_code == "zoomin" -%}
+        .interaction(iced::mouse::Interaction::ZoomIn)
+        {%- elif cursor_type_code == "zoomout" -%}
+        .interaction(iced::mouse::Interaction::ZoomOut)
+        {%- endif -%}        
+    {%- endif -%}
+{% endcomponent %}    

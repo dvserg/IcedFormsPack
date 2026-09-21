@@ -1,0 +1,48 @@
+{# Файл: templates/components/geimetry.tera #}
+{# ПРАВИЛО: Сначала проверяем модифицированные предпарсингом данные 'xxx_code', потом оригинальные 'xxx' #}
+
+{# Базовая геометрия #}
+
+
+{# --- width --- #}
+{% component width(props) %}
+    {# width #}
+    {%- if props.width_code is defined and props.width_code -%}
+        .width({{ props.width_code }})
+    {%- elif props.width is defined and props.width -%}
+        .width({{ props.width }})
+    {%- endif -%}
+{% endcomponent %}
+
+
+{# --- height --- #}
+{% component height(props) %}
+    {# width #}
+    {%- if props.height_code is defined and props.height_code -%}
+        .height({{ props.height_code }})
+    {%- elif props.height is defined and props.height -%}
+        .height({{ props.height }})
+    {%- endif -%}
+{% endcomponent %}
+
+
+{# --- max_width --- #}
+{% component max_width(props) %}
+    {# max_width #}
+    {%- if props.max_width_code is defined and props.max_width_code -%}
+        .max_width({{ props.max_width_code }})
+    {%- elif props.max_width is defined and props.max_width -%}
+        .max_width({{ props.max_width }})
+    {%- endif -%}
+{% endcomponent %}
+
+
+{# --- max_height --- #}
+{% component max_height(props) %}
+    {# max_height #}
+    {%- if props.max_height_code is defined and props.max_height_code -%}
+        .max_height({{ props.max_height_code }})
+    {%- elif props.max_height is defined and props.max_height -%}
+        .max_height({{ props.max_height }})
+    {%- endif -%}
+{% endcomponent %}

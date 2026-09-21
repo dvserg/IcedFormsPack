@@ -1,0 +1,89 @@
+{# Файл: templates/widgets/toggler.tera #}
+{# --- TOGGLER --- #}
+
+{# Конструктор Iced 0.14: принимает строго один логический аргумент состояния #}
+toggler( app.state.{{ id }}_checked )
+    {{- < label         props={widget.properties} /> -}}
+    {{- < width         props={widget.properties} /> -}}
+    {{- < flag_size_tgl props={widget.properties} /> -}}
+    {{- < spacing       props={widget.properties} /> -}}
+    {{- < font          props={widget.properties} /> -}}
+    {{- < toggle_style  props={widget.properties} id={widget.meta.id}/> -}}
+    {{- < on_toggle     widget={widget} /> -}}
+
+{# --- state_toggler_declare --- #}
+{% component state_toggler_declare(widgets_order, widgets) %}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "toggler" %}
+            {# Объявление State toggler: Текущее состояние #}
+            pub {{ id }}_checked: bool,
+        {%- endif -%}
+    {%- endfor -%}
+{% endcomponent %}
+
+{# --- state_toggler__init --- #}
+{% component state_toggler_init(widgets_order, widgets) %}
+    {# Инициализация State toggler: Текущее состояние #}
+    {%- for id in widgets_order -%}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "toggler" -%}
+            {%- set start_state = widget.properties | get(key="value_code", default=widget.properties | get(key="id_checked_code", default="false")) -%}
+            {{ id }}_checked: {{ start_state }},
+        {%- endif -%}
+    {%- endfor -%}
+{% endcomponent %}
+
+{# --- state_toggler_update --- #}
+{% component state_toggler_update(widgets_order, widgets) %}
+   {% for id in widgets_order %}
+        {%- set widget = widgets[id] -%}
+        {%- if widget.widget_type == "toggler" -%}
+            if id == String::from("{{id}}") {
+                app.state.{{ id }}_checked = value;
+            }
+        {%- endif -%}
+    {% endfor %}
+{% endcomponent %}
+
+{# --- flag_size_tgl --- #}
+{% component flag_size_tgl(props) %}
+    {%- if props.flag_size_code is defined and props.flag_size_code -%}
+        .size({{ props.flag_size_code }})
+    {%- elif props.flag_size is defined and props.flag_size -%}
+        .size({{ props.flag_size }})
+    {%- endif -%}
+{% endcomponent %}
+
+{# --- toggle_style --- #}
+{% component toggle_style(props, id) %}
+    {%- if props.bg_color is defined or props.active_color is defined 
+        or props.fg_color is defined or props.text_color is defined -%}
+
+        .style(move |_theme, _status| {
+            let is_on = app.state.{{id}}_checked;
+            let mut base_style = iced::widget::toggler::default(_theme, _status);
+
+            {%- if props.bg_color is defined and props.bg_color != "Color::TRANSPARENT" -%}
+                base_style.background = iced::Background::Color({{props.bg_color_code}});
+            {%- endif -%}
+
+            {%- if props.active_color is defined and props.active_color != "Color::TRANSPARENT" -%}
+                if (is_on) {
+                    base_style.background = iced::Background::Color({{props.active_color_code}});
+                }
+            {%- endif -%}
+           
+
+            {%- if props.fg_color is defined and props.fg_color != "Color::TRANSPARENT" -%}
+                base_style.foreground = iced::Background::Color({{props.fg_color_code}});
+            {%- endif -%}
+
+            {%- if props.text_color is defined and props.text_color != "Color::TRANSPARENT" -%}
+                base_style.text_color = Some({{props.text_color_code}});
+            {%- endif -%}
+
+            base_style
+        })
+    {%- endif -%}
+{% endcomponent %}

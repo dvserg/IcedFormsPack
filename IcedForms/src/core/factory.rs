@@ -44,7 +44,8 @@ pub struct Factory {
     //     Нужен чтобы гарантировать, что ни один виджет в программе не получит одинаковый ID.
 
     // !!! widget_counter ???
-    pub field_counter: usize,
+    //pub field_counter: usize,
+    pub widget_counter: usize,
 
     // Режим дизайнера
     //#[serde(skip_deserializing, skip_serializing)]
@@ -78,7 +79,7 @@ impl Factory {
         self.field_values.borrow_mut().clear_all();
 
         // Сброс счетчика ID виджетов
-        self.field_counter = 0;
+        self.widget_counter = 0;
 
         // Очистка общего кеша рендер-стейтов
         //self.render_cache.borrow_mut().clear();
@@ -104,8 +105,8 @@ impl Factory {
     // Создание экземпляра виджета
     // Возвращает ID созданного виджета
     pub fn create_blueprint(&mut self, w_type: &str) -> String {
-        self.field_counter += 1;
-        let unique_id = format!("widget_{}", self.field_counter);
+        self.widget_counter += 1;
+        let unique_id = format!("widget_{}", self.widget_counter);
 
         // Ищем создателя в карте по строковому имени
         if let Some(creator) = self.creators.get(w_type) {
@@ -336,8 +337,8 @@ impl Factory {
         if let Some(rc_slot) = self.blueprints.get_mut(widget_id) {
             
             // Получаем очередной системный id для виджета
-            let new_id = self.field_counter;
-            self.field_counter += 1;
+            let new_id = self.widget_counter;
+            self.widget_counter += 1;
 
             // Вынимаем оригинальный Rc, вставляя заглушку
             let mut bp_rc = std::mem::replace(
@@ -883,8 +884,8 @@ impl Factory {
 
 
 
-    pub fn get_field_counter(&self) -> usize {
-        self.field_counter
+    pub fn get_widget_counter(&self) -> usize {
+        self.widget_counter
     }
 }
 
@@ -897,7 +898,7 @@ impl Default for Factory {
         let mut factory = Self {
             blueprints:     IndexMap::new(),
             field_values:   RefCell::new(crate::core::PropertyStorage::new()),
-            field_counter:  0,
+            widget_counter: 0,
             creators:       BTreeMap::new(),
             // Начальное значение переменной устанавливаем в design_mode
             is_design_mode: true,
